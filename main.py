@@ -20,6 +20,40 @@ title_font = pygame.font.Font("fonts/PixelOperatorHB8.ttf", 55)
 title_surf = title_font.render('SCHOOLTALE', False, 'white')
 title_rect = title_surf.get_rect(center=(400, 150))
 
+#CUTSCENE1
+cutscene1_surface1_surf = pygame.Surface((700, 100))
+cutscene1_surface1_surf.fill('black')
+pygame.draw.rect(cutscene1_surface1_surf, 'white', cutscene1_surface1_surf.get_rect(), 3)
+cutscene1_surface1_rect = cutscene1_surface1_surf.get_rect(topleft=(50, 275))
+
+cutscene_font = pygame.font.Font("fonts/PixelOperator8.ttf", 15)
+dialogue_1_surf = cutscene_font.render('I really do not want to be here...', False, 'white')
+dialogue_1_rect = dialogue_1_surf.get_rect(topleft=(20, 20))
+
+dialogue_2_surf = cutscene_font.render("Seriously, what does changing schools even do?", False, 'white')
+dialogue_2_rect = dialogue_2_surf.get_rect(topleft=(20, 20))
+
+dialogue_3_surf = cutscene_font.render('...', False, 'white')
+dialogue_3_rect = dialogue_3_surf.get_rect(topleft=(20, 20))
+
+dialogue_4_surf = cutscene_font.render('Fine, maybe third times the charm...', False, 'white')
+dialogue_4_rect = dialogue_3_surf.get_rect(topleft=(20, 20))
+
+#OUTSIDE_CUTSCENE
+outside_background_surf = pygame.image.load('images/outside_bg.png')
+outside_background_rect = outside_background_surf.get_rect()
+
+main_character_surf = pygame.image.load('images/main_character.png')
+main_character_rect = main_character_surf.get_rect(center=(700, 220))
+
+outside_dialogue_1_surf = cutscene_font.render('...', False, 'white')
+outside_dialogue_1_rect = outside_dialogue_1_surf.get_rect(topleft=(20, 20))
+
+outside_dialogue_2_surf = cutscene_font.render('Okay Tomori High...', False, 'white')
+outside_dialogue_2_rect = outside_dialogue_1_surf.get_rect(topleft=(20, 20))
+
+outside_dialogue_3_surf = cutscene_font.render("Let's see what you got.", False, 'white')
+outside_dialogue_3_rect = outside_dialogue_1_surf.get_rect(topleft=(20, 20))
 #FIGHT1
 # background image
 background_surf = pygame.image.load('images/background.png')
@@ -29,7 +63,7 @@ gaming_surf = pygame.Surface((700, 300), pygame.SRCALPHA)
 gaming_surf.fill((106, 103, 103, 128))
 
 # character image 
-character_surf = pygame.image.load('images/character.png')
+character_surf = pygame.image.load('images/main_character_head.png')
 character_surf = pygame.transform.scale(character_surf, (80, 90))  # width x height
 character_rect = character_surf.get_rect(topleft=(350,150))
 
@@ -50,10 +84,10 @@ while True:
 
         if current_state == "MENU":
             if event.type == pygame.MOUSEBUTTONDOWN:
-                current_state = "FIGHT1"
-                start_time = pygame.time.get_ticks()
-            GAME_DURATION = 31000 # 1s = 1000
-            lives = 3  
+                current_state = "CUTSCENE1"
+                cutscene_start_time = pygame.time.get_ticks()
+                GAME_DURATION = 31000 # 1s = 1000
+                lives = 3  
 
     t = pygame.time.get_ticks()
     brightness = (t // 500) % 2
@@ -66,7 +100,69 @@ while True:
     if current_state == "MENU":
         screen.blit(title_surf, title_rect)
         screen.blit(start_surf, start_rect)
+    
+    if current_state == "CUTSCENE1":    
+        screen.fill('black')
+        elapsed_time = pygame.time.get_ticks() - cutscene_start_time
+        if 5000 < elapsed_time < 10000:
+            cutscene1_surface1_surf.blit(dialogue_1_surf, dialogue_1_rect)
+            screen.blit(cutscene1_surface1_surf, cutscene1_surface1_rect)
+        if 10000 < elapsed_time < 15000:
+            cutscene1_surface1_surf.fill('black')
+            pygame.draw.rect(cutscene1_surface1_surf,'white', cutscene1_surface1_surf.get_rect(), 3)
+            cutscene1_surface1_surf.blit(dialogue_2_surf, dialogue_2_rect)
+            screen.blit(cutscene1_surface1_surf, cutscene1_surface1_rect)
+        if 15000 < elapsed_time < 20000:
+            cutscene1_surface1_surf.fill('black')
+            pygame.draw.rect(cutscene1_surface1_surf,'white', cutscene1_surface1_surf.get_rect(), 3)
+            cutscene1_surface1_surf.blit(dialogue_3_surf, dialogue_3_rect)
+            screen.blit(cutscene1_surface1_surf, cutscene1_surface1_rect)
+        if 20000 < elapsed_time < 25000:
+            cutscene1_surface1_surf.fill('black')
+            pygame.draw.rect(cutscene1_surface1_surf,'white', cutscene1_surface1_surf.get_rect(), 3)
+            cutscene1_surface1_surf.blit(dialogue_4_surf, dialogue_4_rect)
+            screen.blit(cutscene1_surface1_surf, cutscene1_surface1_rect)
+        if 25000 < elapsed_time < 30000:
+            current_state = "OUTSIDE_PHASE"
+            start_time = pygame.time.get_ticks()
+    
+    if current_state == "OUTSIDE_PHASE":
+        elapsed_time = pygame.time.get_ticks() - cutscene_start_time
+
+        screen.blit(outside_background_surf, outside_background_rect)
+        screen.blit(main_character_surf, main_character_rect)
+        cutscene1_surface1_surf.fill('black')
+        pygame.draw.rect(cutscene1_surface1_surf,'white', cutscene1_surface1_surf.get_rect(), 3)
+        cutscene1_surface1_surf.blit(outside_dialogue_1_surf, outside_dialogue_1_rect)
+        screen.blit(cutscene1_surface1_surf, cutscene1_surface1_rect)
+
+        if 25000 < elapsed_time < 30000:
+            cutscene1_surface1_surf.fill('black')
+            pygame.draw.rect(cutscene1_surface1_surf,'white', cutscene1_surface1_surf.get_rect(), 3)
+            cutscene1_surface1_surf.blit(outside_dialogue_1_surf, outside_dialogue_1_rect)
+            screen.blit(cutscene1_surface1_surf, cutscene1_surface1_rect)
+
+        if 30000 < elapsed_time < 35000:
+            cutscene1_surface1_surf.fill('black')
+            pygame.draw.rect(cutscene1_surface1_surf,'white', cutscene1_surface1_surf.get_rect(), 3)
+            cutscene1_surface1_surf.blit(outside_dialogue_2_surf, outside_dialogue_2_rect)
+            screen.blit(cutscene1_surface1_surf, cutscene1_surface1_rect)
+
+        if 35000 < elapsed_time < 40000:
+            cutscene1_surface1_surf.fill('black')
+            pygame.draw.rect(cutscene1_surface1_surf,'white', cutscene1_surface1_surf.get_rect(), 3)
+            cutscene1_surface1_surf.blit(outside_dialogue_3_surf, outside_dialogue_3_rect)
+            screen.blit(cutscene1_surface1_surf, cutscene1_surface1_rect)
         
+        if 35000 < elapsed_time < 40000:
+            cutscene1_surface1_surf.fill((0, 0, 0, 180))
+            pygame.draw.rect(cutscene1_surface1_surf,'white', cutscene1_surface1_surf.get_rect(), 3)
+            cutscene1_surface1_surf.blit(outside_dialogue_3_surf, outside_dialogue_3_rect)
+            screen.blit(cutscene1_surface1_surf, cutscene1_surface1_rect)
+        if elapsed_time > 40000:
+            current_state = "FIGHT1"
+            start_time = pygame.time.get_ticks()
+
     if current_state == "FIGHT1":
         # elapsed time
         elapsed_time = pygame.time.get_ticks() - start_time
@@ -74,17 +170,17 @@ while True:
         # draw background first
         screen.blit(background_surf, background_rect)
         screen.blit(gaming_surf, (50, 50))
-
+        
         if elapsed_time < GAME_DURATION and lives > 0:
             # character
             screen.blit(character_surf, character_rect)
 
             # spawn backpack
-            spawn_delay = 5000
-            if pygame.time.get_ticks() > spawn_delay:
+            spawn_delay = 3000
+            if elapsed_time > spawn_delay:
                 screen.blit(backpack_surf, backpack_rect)
 
-                right_speed = random.randint(5, 8)
+                right_speed = random.randint(7, 9)
                 backpack_rect.right -= right_speed
                 if backpack_rect.left < 50:
                     backpack_rect.x = 675
