@@ -62,8 +62,17 @@ inside_background_rect = inside_background_surf.get_rect()
 bully_inside_surf = pygame.image.load('images/bully.png')
 bully_inside_rect = bully_inside_surf.get_rect(center=(400, 100))
 
-inside_dialogue_1_surf = cutscene_font.render('Hey there chump...', False, 'white')
+inside_dialogue_1_surf = cutscene_font.render('Hey there chump...', False, 'red')
 inside_dialogue_1_rect = inside_dialogue_1_surf.get_rect(topleft=(20, 20))
+
+inside_dialogue_2_surf = cutscene_font.render('You got lunch money?', False, 'red')
+inside_dialogue_2_rect = inside_dialogue_2_surf.get_rect(topleft=(20, 20))
+
+inside_dialogue_3_surf = cutscene_font.render('...', False, 'white')
+inside_dialogue_3_rect = inside_dialogue_3_surf.get_rect(topleft=(20, 20))
+
+inside_dialogue_4_surf = cutscene_font.render('Oh boy...', False, 'white')
+inside_dialogue_4_rect = inside_dialogue_4_surf.get_rect(topleft=(20, 20))
 
 #FIGHT1
 # background image
