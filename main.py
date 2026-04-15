@@ -131,6 +131,7 @@ while True:
 
         screen.blit(outside_background_surf, outside_background_rect)
         screen.blit(main_character_surf, main_character_rect)
+
         cutscene1_surface1_surf.fill('black')
         pygame.draw.rect(cutscene1_surface1_surf,'white', cutscene1_surface1_surf.get_rect(), 3)
         cutscene1_surface1_surf.blit(outside_dialogue_1_surf, outside_dialogue_1_rect)
@@ -159,13 +160,43 @@ while True:
             pygame.draw.rect(cutscene1_surface1_surf,'white', cutscene1_surface1_surf.get_rect(), 3)
             cutscene1_surface1_surf.blit(outside_dialogue_3_surf, outside_dialogue_3_rect)
             screen.blit(cutscene1_surface1_surf, cutscene1_surface1_rect)
+
         if elapsed_time > 40000:
+            current_state = "OUTSIDE_FREE_ROAM"
+            roam_start_time = pygame.time.get_ticks()
+
+    if current_state == "OUTSIDE_FREE_ROAM":
+        screen.blit(outside_background_surf, outside_background_rect)
+        screen.blit(main_character_surf, main_character_rect)
+
+        # controls
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_w]:
+            main_character_rect.y -= 5
+        if keys[pygame.K_a]:
+            main_character_rect.x -= 5
+        if keys[pygame.K_s]:
+            main_character_rect.y += 5
+        if keys[pygame.K_d]:
+            main_character_rect.x += 5
+
+        # boundaries
+        if main_character_rect.top < 0:
+            main_character_rect.top = 0
+        if main_character_rect.left < 0:
+            main_character_rect.left = 0
+        if main_character_rect.bottom > screen_height:
+            main_character_rect.bottom = screen_height
+        if main_character_rect.right > screen_width:
+            main_character_rect.right = screen_width
+
+        if pygame.time.get_ticks() - roam_start_time > 10000:
             current_state = "FIGHT1"
-            start_time = pygame.time.get_ticks()
+            f1_start_time = pygame.time.get_ticks()
 
     if current_state == "FIGHT1":
         # elapsed time
-        elapsed_time = pygame.time.get_ticks() - start_time
+        elapsed_time = pygame.time.get_ticks() - f1_start_time
 
         # draw background first
         screen.blit(background_surf, background_rect)
