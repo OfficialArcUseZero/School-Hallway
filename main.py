@@ -54,9 +54,20 @@ outside_dialogue_2_rect = outside_dialogue_1_surf.get_rect(topleft=(20, 20))
 
 outside_dialogue_3_surf = cutscene_font.render("Let's see what you got.", False, 'white')
 outside_dialogue_3_rect = outside_dialogue_1_surf.get_rect(topleft=(20, 20))
+
+#INSIDE CUTSCENE
+inside_background_surf = pygame.image.load('images/inside_bg.png')
+inside_background_rect = inside_background_surf.get_rect()
+
+bully_inside_surf = pygame.image.load('images/bully.png')
+bully_inside_rect = bully_inside_surf.get_rect(center=(400, 100))
+
+inside_dialogue_1_surf = cutscene_font.render('Hey there chump...', False, 'white')
+inside_dialogue_1_rect = inside_dialogue_1_surf.get_rect(topleft=(20, 20))
+
 #FIGHT1
 # background image
-background_surf = pygame.image.load('images/background.png')
+background_surf = pygame.image.load('images/wall_background.png')
 background_rect = background_surf.get_rect()
 
 gaming_surf = pygame.Surface((700, 300), pygame.SRCALPHA)
@@ -163,7 +174,6 @@ while True:
 
         if elapsed_time > 40000:
             current_state = "OUTSIDE_FREE_ROAM"
-            roam_start_time = pygame.time.get_ticks()
 
     if current_state == "OUTSIDE_FREE_ROAM":
         screen.blit(outside_background_surf, outside_background_rect)
@@ -190,13 +200,52 @@ while True:
         if main_character_rect.right > screen_width:
             main_character_rect.right = screen_width
 
-        if pygame.time.get_ticks() - roam_start_time > 10000:
+        door_collision_rect = pygame.Rect(270, 100, 180, 20)
+        if main_character_rect.colliderect(door_collision_rect):
+            current_state = "INSIDE_CUTSCENE"
+            main_character_rect.center = (700, 220)
+
+    if current_state == "INSIDE_CUTSCENE":
+        screen.blit(inside_background_surf, inside_background_rect)
+        screen.blit(bully_inside_surf, bully_inside_rect)
+        screen.blit(main_character_surf, main_character_rect)
+
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_w]:
+        main_character_rect.y -= 5
+    if keys[pygame.K_a]:
+        main_character_rect.x -= 5
+    if keys[pygame.K_s]:
+        main_character_rect.y += 5
+    if keys[pygame.K_d]:
+        main_character_rect.x += 5
+
+    if  main_character_rect.top < 75:
+        main_character_rect.top = 75
+    if main_character_rect.left < 10:
+        main_character_rect.left = 10
+    if main_character_rect.bottom > 385:
+        main_character_rect.bottom = 385
+    if main_character_rect.right > 765:
+        main_character_rect.right = 765
+
+    if current_state == "INSIDE_CUTSCENE" and main_character_rect.colliderect(bully_inside_rect):
+        dialogue_start_time = pygame.time.get_ticks()
+        elapsed_time = pygame.time.get_ticks() - dialogue_start_time
+        
+        cutscene1_surface1_surf.fill('black')
+        pygame.draw.rect(cutscene1_surface1_surf,'white', cutscene1_surface1_surf.get_rect(), 3)
+        cutscene1_surface1_surf.blit(inside_dialogue_1_surf, inside_dialogue_1_rect)
+        screen.blit(cutscene1_surface1_surf, cutscene1_surface1_rect)
+        
+        if elapsed_time < 5000:
             current_state = "FIGHT1"
-            f1_start_time = pygame.time.get_ticks()
+            start_time = pygame.time.get_ticks()
+            lives = 3
 
     if current_state == "FIGHT1":
         # elapsed time
-        elapsed_time = pygame.time.get_ticks() - f1_start_time
+        elapsed_time = pygame.time.get_ticks() - start_time
 
         # draw background first
         screen.blit(background_surf, background_rect)
