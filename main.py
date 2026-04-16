@@ -173,7 +173,7 @@ while True:
         elapsed = pygame.time.get_ticks() - cutscene_start_time
         print(elapsed)
 
-        screen.blit(outside_background_surf, outside_background_rect)
+        screen.blit(outside_background_closed_surf, outside_background_rect)
         screen.blit(main_character_surf, main_character_rect)
 
         cutscene1_surface1_surf.fill('black')
@@ -429,7 +429,7 @@ while True:
 
         if pygame.mouse.get_pressed()[0]:
             current_state = "MENU"  
-
+            door_open = False
 
     pygame.display.update()
     clock.tick(60)
