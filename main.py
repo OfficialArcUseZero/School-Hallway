@@ -11,6 +11,7 @@ screen_height = 400
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption('Schooltale')
 clock = pygame.time.Clock()
+name_font = pygame.font.Font("fonts/PixelOperatorHB8.ttf", 18)
 
 current_state = "MENU"
 
@@ -31,18 +32,35 @@ dialogue_2_surf = cutscene_font.render("Seriously, what does changing schools ev
 dialogue_3_surf = cutscene_font.render('...', False, 'white')
 dialogue_4_surf = cutscene_font.render('Fine, maybe third times the charm...', False, 'white')
 
-dialogue_rect = dialogue_1_surf.get_rect(topleft=(20, 20))
+dialogue_rect = dialogue_1_surf.get_rect(topleft=(20, 40))
 
 # OUTSIDE_CUTSCENE
 outside_background_surf = pygame.image.load('images/outside_bg.png')
 outside_background_rect = outside_background_surf.get_rect()
 
+outside_background_open_surf = pygame.image.load('images/Door_Open.png')
+outside_background_closed_surf = pygame.image.load('images/outside_bg.png')
+
+prompt_surf = pygame.Surface((300, 100))
+prompt_surf_rect = prompt_surf.get_rect(center=(400, 200))
+prompt_surf.fill((0, 0, 0, 180))
+
+enter_school = cutscene_font.render('Enter School', False, 'white')
+enter_school_rect = enter_school.get_rect(center=(400, 200))
+yes_choice = cutscene_font.render('Yes', False, 'white')
+yes_choice_rect = yes_choice.get_rect(center=(300, 225))
+no_choice = cutscene_font.render('No', False, 'white')
+no_choice_rect = no_choice.get_rect(center=(500, 225))
+
 main_character_surf = pygame.image.load('images/main_character.png')
 main_character_rect = main_character_surf.get_rect(center=(700, 220))
+main_character_rect_reset = main_character_surf.get_rect(center=(700, 220))
 
 outside_dialogue_1 = cutscene_font.render('...', False, 'white')
 outside_dialogue_2 = cutscene_font.render('Okay Tomori High...', False, 'white')
 outside_dialogue_3 = cutscene_font.render("Let's see what you got.", False, 'white')
+
+
 
 # INSIDE_CUTSCENE
 inside_background_surf = pygame.image.load('images/inside_bg.png')
@@ -51,8 +69,23 @@ inside_background_rect = inside_background_surf.get_rect()
 bully_inside_surf = pygame.image.load('images/bully.png')
 bully_inside_rect = bully_inside_surf.get_rect(center=(400, 100))
 
-inside_dialogue_1_surf = cutscene_font.render('...', False, 'white')
-inside_dialogue_1_rect = inside_dialogue_1_surf.get_rect(topleft=(20, 20))
+inside_dialogue_1_surf = cutscene_font.render('Hey there chump...', False, 'red')
+inside_dialogue_1_rect = inside_dialogue_1_surf.get_rect(topleft=(20, 40))
+
+inside_dialogue_2_surf = cutscene_font.render("You don't belong here.", False, 'red')
+inside_dialogue_2_rect = inside_dialogue_2_surf.get_rect(topleft=(20, 40))
+
+inside_dialogue_3_surf = cutscene_font.render("I've heard worse than that.", False, 'white')
+inside_dialogue_3_rect = inside_dialogue_3_surf.get_rect(topleft=(20, 40))
+
+inside_dialogue_4_surf = cutscene_font.render("Good. Then let's see how you handle this.", False, 'red')
+inside_dialogue_4_rect = inside_dialogue_2_surf.get_rect(topleft=(20, 40))
+
+inside_dialogue_5_surf = cutscene_font.render("Handle what?", False, 'white')
+inside_dialogue_5_rect = inside_dialogue_3_surf.get_rect(topleft=(20, 40))
+
+inside_dialogue_6_surf = cutscene_font.render("This!", False, 'red')
+inside_dialogue_6_rect = inside_dialogue_2_surf.get_rect(topleft=(20, 40))
 
 # FIGHT1
 background_surf = pygame.image.load('images/wall_background.png')
@@ -75,6 +108,9 @@ backpack_rect = backpack_surf.get_rect(topleft=(675, 250))
 heart_surf = pygame.image.load('images/heart.png')
 heart_surf = pygame.transform.scale(heart_surf, (30, 30))
 
+GAME_DURATION = 31000
+lives = 3
+
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -85,8 +121,7 @@ while True:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 current_state = "CUTSCENE1"
                 cutscene_start_time = pygame.time.get_ticks()
-                GAME_DURATION = 31000
-                lives = 3
+                
 
     # MENU
     if current_state == "MENU":
@@ -106,17 +141,26 @@ while True:
     if current_state == "CUTSCENE1":
         screen.fill('black')
         elapsed = pygame.time.get_ticks() - cutscene_start_time
+        print(elapsed)
 
         cutscene1_surface1_surf.fill('black')
         pygame.draw.rect(cutscene1_surface1_surf, 'white', cutscene1_surface1_surf.get_rect(), 3)
 
         if 5000 < elapsed < 10000:
+            name_surf = name_font.render('Kirito', False, 'white')
+            cutscene1_surface1_surf.blit(name_surf, (20, 10))
             cutscene1_surface1_surf.blit(dialogue_1_surf, dialogue_rect)
         elif 10000 < elapsed < 15000:
+            name_surf = name_font.render('Kirito', False, 'white')
+            cutscene1_surface1_surf.blit(name_surf, (20, 10))
             cutscene1_surface1_surf.blit(dialogue_2_surf, dialogue_rect)
         elif 15000 < elapsed < 20000:
+            name_surf = name_font.render('Kirito', False, 'white')
+            cutscene1_surface1_surf.blit(name_surf, (20, 10))
             cutscene1_surface1_surf.blit(dialogue_3_surf, dialogue_rect)
         elif 20000 < elapsed < 25000:
+            name_surf = name_font.render('Kirito', False, 'white')
+            cutscene1_surface1_surf.blit(name_surf, (20, 10))
             cutscene1_surface1_surf.blit(dialogue_4_surf, dialogue_rect)
         elif elapsed > 25000:
             current_state = "OUTSIDE_PHASE"
@@ -126,12 +170,15 @@ while True:
     # OUTSIDE PHASE
     if current_state == "OUTSIDE_PHASE":
         elapsed = pygame.time.get_ticks() - cutscene_start_time
+        print(elapsed)
 
         screen.blit(outside_background_surf, outside_background_rect)
         screen.blit(main_character_surf, main_character_rect)
 
         cutscene1_surface1_surf.fill('black')
         pygame.draw.rect(cutscene1_surface1_surf, 'white', cutscene1_surface1_surf.get_rect(), 3)
+        name_surf = name_font.render('Kirito', False, 'white')
+        cutscene1_surface1_surf.blit(name_surf, (20, 10))
 
         if 25000 < elapsed < 30000:
             cutscene1_surface1_surf.blit(outside_dialogue_1, dialogue_rect)
@@ -172,18 +219,22 @@ while True:
 
         door_collision_rect = pygame.Rect(270, 100, 180, 20)
 
+        door_collision_rect = pygame.Rect(270, 75, 180, 10)
         if main_character_rect.colliderect(door_collision_rect):
-            current_state = "BLACK_TRANSITION"
-            transition_start_time = pygame.time.get_ticks()
-
-    if current_state == "BLACK_TRANSITION":
-        screen.fill("black")
-
-        elapsed = pygame.time.get_ticks() - transition_start_time
-
-        if elapsed > 1200:
-            current_state = "INSIDE_CUTSCENE"
-            main_character_rect.center = (700, 220)
+            outside_background_surf = outside_background_open_surf
+            screen.blit(prompt_surf, prompt_surf_rect)
+            pygame.draw.rect(prompt_surf, 'white', prompt_surf.get_rect(), 3)
+            screen.blit(enter_school, enter_school_rect)
+            screen.blit(yes_choice, yes_choice_rect)
+            screen.blit(no_choice, no_choice_rect)
+            mouse_pos = pygame.mouse.get_pos()
+            if yes_choice_rect.collidepoint(mouse_pos) and pygame.mouse.get_pressed()[0]:
+                current_state = "INSIDE_CUTSCENE"
+                main_character_rect.center = (700, 220)
+            elif no_choice_rect.collidepoint(mouse_pos) and pygame.mouse.get_pressed()[0]:
+                main_character_rect.y += 20
+                current_state = "OUTSIDE_FREE_ROAM"
+                outside_background_surf = outside_background_closed_surf
 
     if current_state == "INSIDE_CUTSCENE":
         screen.blit(inside_background_surf, inside_background_rect)
@@ -214,14 +265,36 @@ while True:
             current_state = "INSIDE_DIALOGUE"
     
     if current_state == "INSIDE_DIALOGUE":
-        screen.fill('black')
         elapsed = pygame.time.get_ticks() - dialogue_start_time
+        
 
         cutscene1_surface1_surf.fill('black')
         pygame.draw.rect(cutscene1_surface1_surf, 'white', cutscene1_surface1_surf.get_rect(), 3)
-
-        if elapsed < 5000:
+        
+        if elapsed < 4000:
+            name_surf = name_font.render("Ryuga", False, "red")
+            cutscene1_surface1_surf.blit(name_surf, (20, 10))
             cutscene1_surface1_surf.blit(inside_dialogue_1_surf, inside_dialogue_1_rect)
+        elif elapsed < 8000:
+            name_surf = name_font.render("Ryuga", False, "red")
+            cutscene1_surface1_surf.blit(name_surf, (20, 10))
+            cutscene1_surface1_surf.blit(inside_dialogue_2_surf, inside_dialogue_2_rect)
+        elif elapsed < 12000:
+            name_surf = name_font.render("Kirito", False, "white")
+            cutscene1_surface1_surf.blit(name_surf, (20, 10))
+            cutscene1_surface1_surf.blit(inside_dialogue_3_surf, inside_dialogue_3_rect)
+        elif elapsed < 16000:
+            name_surf = name_font.render("Ryuga", False, "red")
+            cutscene1_surface1_surf.blit(name_surf, (20, 10))
+            cutscene1_surface1_surf.blit(inside_dialogue_4_surf, inside_dialogue_4_rect)
+        elif elapsed < 19000:
+            name_surf = name_font.render("Kirito", False, "white")
+            cutscene1_surface1_surf.blit(name_surf, (20, 10))
+            cutscene1_surface1_surf.blit(inside_dialogue_5_surf, inside_dialogue_5_rect)
+        elif elapsed < 20000:
+            name_surf = name_font.render("Ryuga", False, "red")
+            cutscene1_surface1_surf.blit(name_surf, (20, 10))
+            cutscene1_surface1_surf.blit(inside_dialogue_6_surf, inside_dialogue_6_rect)
         else:
             current_state = "FIGHT1"
             start_time = pygame.time.get_ticks()
@@ -230,16 +303,20 @@ while True:
         screen.blit(cutscene1_surface1_surf, cutscene1_surface1_rect)
 
     if current_state == "FIGHT1":
-        # elapsed time
         elapsed_time = pygame.time.get_ticks() - start_time
 
-        # draw background first
         screen.blit(background_surf, background_rect)
-        screen.blit(gaming_surf, (50, 50))
+        screen.blit(gaming_surf, (50, 50)) 
 
         if elapsed_time < GAME_DURATION and lives > 0:
-            # character
+
             screen.blit(character_surf, character_rect)
+        
+            if elapsed_time < 2000:
+                tutorial_font = pygame.font.Font("fonts/PixelOperatorHB8.ttf", 30)
+                tutorial_text = tutorial_font.render("DODGE THE BACKPACKS!", True, 'red')
+                tutorial_rect = tutorial_text.get_rect(center=(400, 200))
+                screen.blit(tutorial_text, tutorial_rect)    
 
             # spawn backpack
             spawn_delay = 3000
@@ -337,8 +414,11 @@ while True:
         screen.blit(game_over_text, game_over_rect)
         screen.blit(game_over_text2, game_over_rect2)
 
+        main_character_rect = main_character_rect_reset
+
         if pygame.mouse.get_pressed()[0]:
             current_state = "MENU"  
+
 
     pygame.display.update()
     clock.tick(60)
