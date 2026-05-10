@@ -8,6 +8,7 @@ pygame.init()
 screen_width = 800
 screen_height = 400
 door_open = False
+music_collision_start_time = None
 
 screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption('Schooltale')
@@ -86,6 +87,47 @@ inside_dialogue_5_rect = inside_dialogue_3_surf.get_rect(topleft=(20, 40))
 inside_dialogue_6_surf = cutscene_font.render("This!", False, 'red')
 inside_dialogue_6_rect = inside_dialogue_2_surf.get_rect(topleft=(20, 40))
 
+# SECOND HALL CUTSCENE BLACK
+second_hall_cutscene1_surface1_surf = pygame.Surface((700, 100))
+second_hall_cutscene1_surface1_surf.fill('black')
+pygame.draw.rect(second_hall_cutscene1_surface1_surf, 'white', second_hall_cutscene1_surface1_surf.get_rect(), 3)
+cutscene1_surface1_rect = second_hall_cutscene1_surface1_surf.get_rect(topleft=(50, 275))
+
+second_hall_dialogue1 = cutscene_font.render('Phew... got away...', False, 'white')
+second_hall_dialogue2 = cutscene_font.render("That idiot can't run even if his life depended on it.", False, 'white')
+second_hall_dialogue3 = cutscene_font.render('Anyway, since my classes start later...', False, 'white')
+second_hall_dialogue4 = cutscene_font.render('...maybe I can find a club I like.', False, 'white')
+second_hall_dialogue5 = cutscene_font.render('The clubrooms should be by the end of this hall.', False, 'white')
+
+second_hall_dialogue_rect = second_hall_dialogue1.get_rect(topleft=(20, 40))
+
+# SECOND HALL CUTSCENE
+second_hall_background_surf = pygame.image.load('images/second_hall.png')
+second_hall_background_rect = second_hall_background_surf.get_rect()
+second_hall_main_character_surf = pygame.image.load('images/main_character.png')
+second_hall_main_character_rect = second_hall_main_character_surf.get_rect(center=(650, 200))
+
+second_hall_cutscene_dialogue1 = cutscene_font.render('The clubrooms must be behind these doors...', False, 'white')
+second_hall_cutscene_dialogue2 = cutscene_font.render("Let's see who's open...", False, 'white')
+
+second_hall_cutscene_dialogue_rect = second_hall_cutscene_dialogue1.get_rect(topleft=(20, 40))
+
+# SECOND HALL FREE ROAM
+second_hall_freeroam_background_surf = pygame.image.load('images/second_hall.png')
+second_hall_freeroam_background_rect = second_hall_background_surf.get_rect()
+second_hall_freeroam_main_character_surf = pygame.image.load('images/main_character.png')
+second_hall_freeroam_main_character_rect = second_hall_main_character_surf.get_rect(center=(650, 200))
+
+club_dialogue_surf = pygame.Surface((700, 100))
+club_dialogue_rect = club_dialogue_surf.get_rect(topleft=(50, 275))
+
+#MUSIC ROOM
+music_room_surf = pygame.image.load('images/music_room.png')
+music_room_rect = music_room_surf.get_rect()
+
+music_room_main_character_surf = pygame.image.load('images/main_character.png')
+music_room_main_character_rect = music_room_main_character_surf.get_rect(center=(660, 150))
+
 # FIGHT1
 background_surf = pygame.image.load('images/wall_background.png')
 background_rect = background_surf.get_rect()
@@ -119,7 +161,8 @@ while True:
         if current_state == "MENU":
             if event.type == pygame.MOUSEBUTTONDOWN:
                 current_state = "CUTSCENE1"
-                cutscene_start_time = pygame.time.get_ticks()         
+                cutscene_start_time = pygame.time.get_ticks()
+                
 
     # MENU
     if current_state == "MENU":
@@ -162,6 +205,7 @@ while True:
             cutscene1_surface1_surf.blit(dialogue_4_surf, dialogue_rect)
         elif elapsed > 25000:
             current_state = "OUTSIDE_PHASE"
+            main_character_rect.center = (700, 220)
 
         screen.blit(cutscene1_surface1_surf, cutscene1_surface1_rect)
 
@@ -186,6 +230,7 @@ while True:
             cutscene1_surface1_surf.blit(outside_dialogue_3, dialogue_rect)
         elif elapsed > 40000:
             current_state = "OUTSIDE_FREE_ROAM"
+            main_character_rect.center = (700, 220)
 
         screen.blit(cutscene1_surface1_surf, cutscene1_surface1_rect)
 
@@ -217,8 +262,6 @@ while True:
             main_character_rect.bottom = screen_height
         if main_character_rect.right > screen_width:
             main_character_rect.right = screen_width
-
-        door_collision_rect = pygame.Rect(270, 100, 180, 20)
 
         door_collision_rect = pygame.Rect(270, 75, 180, 10)
         if main_character_rect.colliderect(door_collision_rect):
@@ -274,7 +317,6 @@ while True:
     
     if current_state == "INSIDE_DIALOGUE":
         elapsed = pygame.time.get_ticks() - dialogue_start_time
-        
 
         cutscene1_surface1_surf.fill('black')
         pygame.draw.rect(cutscene1_surface1_surf, 'white', cutscene1_surface1_surf.get_rect(), 3)
@@ -370,7 +412,8 @@ while True:
             if lives <= 0:
                 current_state = "GAME_OVER"
             elif elapsed_time >= GAME_DURATION:
-                current_state = "VICTORY"    
+                current_state = "SECOND_HALLWAY_CUTSCENE_BLACK"
+                second_hall_black_start_time = pygame.time.get_ticks()    
             
             continue  
         
@@ -384,7 +427,155 @@ while True:
         for i in range(lives):
             screen.blit(heart_surf, (10 + i * 35, 10))
 
-    elif current_state == "VICTORY":
+    if current_state == "SECOND_HALLWAY_CUTSCENE_BLACK":
+        screen.fill('black')
+        elapsed = pygame.time.get_ticks() - second_hall_black_start_time
+        print(elapsed)
+
+        second_hall_cutscene1_surface1_surf.fill('black')
+        pygame.draw.rect(second_hall_cutscene1_surface1_surf, 'white', second_hall_cutscene1_surface1_surf.get_rect(), 3)
+
+        if 5000 < elapsed < 10000:
+            name_surf = name_font.render('Kirito', False, 'white')
+            second_hall_cutscene1_surface1_surf.blit(name_surf, (20, 10))
+            second_hall_cutscene1_surface1_surf.blit(second_hall_dialogue1, second_hall_dialogue_rect)
+            screen.blit(second_hall_cutscene1_surface1_surf, cutscene1_surface1_rect)
+        if 10000 < elapsed < 15000:
+            name_surf = name_font.render('Kirito', False, 'white')
+            second_hall_cutscene1_surface1_surf.blit(name_surf, (20, 10))
+            second_hall_cutscene1_surface1_surf.blit(second_hall_dialogue2, second_hall_dialogue_rect)
+            screen.blit(second_hall_cutscene1_surface1_surf, cutscene1_surface1_rect)
+        if 15000 < elapsed < 20000:
+            name_surf = name_font.render('Kirito', False, 'white')
+            second_hall_cutscene1_surface1_surf.blit(name_surf, (20, 10))
+            second_hall_cutscene1_surface1_surf.blit(second_hall_dialogue3, second_hall_dialogue_rect)
+            screen.blit(second_hall_cutscene1_surface1_surf, cutscene1_surface1_rect)
+        if 20000 < elapsed < 25000:
+            name_surf = name_font.render('Kirito', False, 'white')
+            second_hall_cutscene1_surface1_surf.blit(name_surf, (20, 10))
+            second_hall_cutscene1_surface1_surf.blit(second_hall_dialogue4, second_hall_dialogue_rect)
+            screen.blit(second_hall_cutscene1_surface1_surf, cutscene1_surface1_rect)
+        if 25000 < elapsed < 30000:
+            name_surf = name_font.render('Kirito', False, 'white')
+            second_hall_cutscene1_surface1_surf.blit(name_surf, (20, 10))
+            second_hall_cutscene1_surface1_surf.blit(second_hall_dialogue5, second_hall_dialogue_rect)
+            screen.blit(second_hall_cutscene1_surface1_surf, cutscene1_surface1_rect)
+        if elapsed > 30000:
+            current_state = "SECOND_HALLWAY_CUTSCENE"
+            second_hall_cutscene_start_time = pygame.time.get_ticks()
+
+    if current_state == "SECOND_HALLWAY_CUTSCENE":
+        elapsed = pygame.time.get_ticks() - second_hall_cutscene_start_time
+        print(elapsed)
+        
+        screen.blit(second_hall_background_surf, second_hall_background_rect)
+        screen.blit(second_hall_main_character_surf, second_hall_main_character_rect)
+
+        cutscene1_surface1_surf.fill('black')
+        pygame.draw.rect(cutscene1_surface1_surf, 'white', cutscene1_surface1_surf.get_rect(), 3)
+        name_surf = name_font.render('Kirito', False, 'white')
+        cutscene1_surface1_surf.blit(name_surf, (20, 10))
+
+        if elapsed < 5000:
+            cutscene1_surface1_surf.blit(second_hall_cutscene_dialogue1, second_hall_cutscene_dialogue_rect)
+        elif 5000 < elapsed < 10000:
+            cutscene1_surface1_surf.blit(second_hall_cutscene_dialogue2, second_hall_cutscene_dialogue_rect)
+
+        screen.blit(cutscene1_surface1_surf, cutscene1_surface1_rect)
+
+        if elapsed > 10000:
+            current_state = "SECOND_HALLWAY_FREEROAM"
+
+    if current_state == "SECOND_HALLWAY_FREEROAM":
+        screen.blit(second_hall_background_surf, second_hall_background_rect)
+        screen.blit(second_hall_main_character_surf, second_hall_main_character_rect)
+
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_w]:
+            second_hall_main_character_rect.y -= 5
+        if keys[pygame.K_a]:
+            second_hall_main_character_rect.x -= 5
+        if keys[pygame.K_s]:
+            second_hall_main_character_rect.y += 5
+        if keys[pygame.K_d]:
+            second_hall_main_character_rect.x += 5
+
+        if second_hall_main_character_rect.top < 45:
+            second_hall_main_character_rect.top = 45
+        if second_hall_main_character_rect.left < 120:
+            second_hall_main_character_rect.left = 120
+        if second_hall_main_character_rect.bottom > 385:
+            second_hall_main_character_rect.bottom = 385
+        if second_hall_main_character_rect.right > 660:
+            second_hall_main_character_rect.right = 660
+
+        robotics_door_collision_rect = pygame.Rect(340, 55, 120, 10)    
+        esports_door_collision_rect = pygame.Rect(195, 55, 100, 10)
+        theater_door_collision_rect = pygame.Rect(500, 55, 100, 10)
+        music_door_collision_rect = pygame.Rect(120, 170, 30, 20)
+
+        if second_hall_main_character_rect.colliderect(robotics_door_collision_rect):
+            robotics_text = cutscene_font.render("It says: 'Robotics Club: Meeting in progress.'", False, 'white')
+            club_dialogue_surf.fill('black')
+            pygame.draw.rect(club_dialogue_surf, 'white',club_dialogue_surf.get_rect(), 3)
+            name_surf = name_font.render('Kirito', False, 'white')
+            club_dialogue_surf.blit(name_surf, (20, 10))
+            club_dialogue_surf.blit(robotics_text, (20, 40))
+            screen.blit(club_dialogue_surf, club_dialogue_rect)
+
+        if second_hall_main_character_rect.colliderect(esports_door_collision_rect):
+            esports_text = cutscene_font.render("It says: 'Esports Club: Sorry, were full.'", False, 'white')
+            club_dialogue_surf.fill('black')
+            pygame.draw.rect(club_dialogue_surf, 'white',club_dialogue_surf.get_rect(), 3)
+            name_surf = name_font.render('Kirito', False, 'white')
+            club_dialogue_surf.blit(name_surf, (20, 10))
+            club_dialogue_surf.blit(esports_text, (20, 40))
+            screen.blit(club_dialogue_surf, club_dialogue_rect)
+
+        if second_hall_main_character_rect.colliderect(theater_door_collision_rect):
+            theater_text = cutscene_font.render("It says: 'Theater Club: Tryouts are next week!'", False, 'white')
+            club_dialogue_surf.fill('black')
+            pygame.draw.rect(club_dialogue_surf, 'white',club_dialogue_surf.get_rect(), 3)
+            name_surf = name_font.render('Kirito', False, 'white')
+            club_dialogue_surf.blit(name_surf, (20, 10))
+            club_dialogue_surf.blit(theater_text, (20, 40))
+            screen.blit(club_dialogue_surf, club_dialogue_rect)
+
+        if second_hall_main_character_rect.colliderect(music_door_collision_rect):
+            print("collision")
+            if music_collision_start_time is None:
+                music_collision_start_time = pygame.time.get_ticks()
+
+            elapsed = pygame.time.get_ticks() - music_collision_start_time
+            print(elapsed)
+
+            if elapsed < 5000:
+                music_text1 = cutscene_font.render("It says: 'Music Club: We're recruiting now!'", False, 'white')
+                club_dialogue_surf.fill('black')
+                pygame.draw.rect(club_dialogue_surf, 'white',club_dialogue_surf.get_rect(), 3)
+                name_surf = name_font.render('Kirito', False, 'white')
+                club_dialogue_surf.blit(name_surf, (20, 10))
+                club_dialogue_surf.blit(music_text1, (20, 40))
+                screen.blit(club_dialogue_surf, club_dialogue_rect)
+            elif 5000 < elapsed < 10000:
+                music_text2 = cutscene_font.render("Hmm... maybe it could be worth a try...", False, 'white')
+                club_dialogue_surf.fill('black')
+                pygame.draw.rect(club_dialogue_surf, 'white',club_dialogue_surf.get_rect(), 3)
+                name_surf = name_font.render('Kirito', False, 'white')
+                club_dialogue_surf.blit(name_surf, (20, 10))
+                club_dialogue_surf.blit(music_text2, (20, 40))
+                screen.blit(club_dialogue_surf, club_dialogue_rect)
+            elif elapsed > 10000:
+                current_state = "MUSIC_ROOM"
+                screen.fill('black')
+        else:
+            music_collision_start_time = None
+
+    if current_state == "MUSIC_ROOM":
+        screen.blit(music_room_surf, music_room_rect)
+        screen.blit(music_room_main_character_surf, music_room_main_character_rect)
+    
+    if current_state == "VICTORY":
         screen.fill("black")
 
         victory_font = pygame.font.Font("fonts/PixelOperatorHB8.ttf", 50)
@@ -408,13 +599,13 @@ while True:
         screen.blit(victory_text2, victory_rect2)
         screen.blit(victory_text3, victory_rect3)
 
-        main_character_rect = main_character_rect_reset
-
         if pygame.mouse.get_pressed()[0]:
             current_state = "MENU"
             door_open = False
+            outside_rect = main_character_surf.get_rect(center=(700, 220))
+            inside_rect = main_character_surf.get_rect(center=(700, 220))
 
-    elif current_state == "GAME_OVER":
+    if current_state == "GAME_OVER":
         screen.fill("black")
 
         game_over_font = pygame.font.Font("fonts/PixelOperatorHB8.ttf", 50)
@@ -436,10 +627,10 @@ while True:
         screen.blit(game_over_text, game_over_rect)
         screen.blit(game_over_text2, game_over_rect2)
 
-        main_character_rect = main_character_rect_reset
-
         if pygame.mouse.get_pressed()[0]:
             current_state = "MENU"  
+            outside_rect = main_character_surf.get_rect(center=(700, 220))
+            inside_rect = main_character_surf.get_rect(center=(700, 220))
             door_open = False
 
     pygame.display.update()
