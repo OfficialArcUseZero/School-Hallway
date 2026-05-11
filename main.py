@@ -121,12 +121,37 @@ second_hall_freeroam_main_character_rect = second_hall_main_character_surf.get_r
 club_dialogue_surf = pygame.Surface((700, 100))
 club_dialogue_rect = club_dialogue_surf.get_rect(topleft=(50, 275))
 
-#MUSIC ROOM
+# MUSIC ROOM
 music_room_surf = pygame.image.load('images/music_room.png')
 music_room_rect = music_room_surf.get_rect()
 
 music_room_main_character_surf = pygame.image.load('images/main_character.png')
 music_room_main_character_rect = music_room_main_character_surf.get_rect(center=(660, 150))
+
+music_girl_surf = pygame.image.load('images/music_girl.png')
+music_girl_rect = music_girl_surf.get_rect(center=(150, 220))
+
+# MUSIC ROOM CUTSCENE
+music_room_cutscene1_surface1_surf = pygame.Surface((700, 100))
+music_room_cutscene1_surface1_surf.fill('black')
+pygame.draw.rect(music_room_cutscene1_surface1_surf, 'white', music_room_cutscene1_surface1_surf.get_rect(), 3)
+cutscene1_surface1_rect = music_room_cutscene1_surface1_surf.get_rect(topleft=(50, 275))
+
+music_room_cutscene1_dialogue1_surf = cutscene_font.render('Oh hi there!', False, 'lavender')
+music_room_cutscene1_dialogue2_surf = cutscene_font.render("I'm Mayumi, vocalist of the music club!", False, 'lavender')
+music_room_cutscene1_dialogue3_surf = cutscene_font.render("Are you interested in joining?", False, 'lavender')
+music_room_cutscene1_dialogue4_surf = cutscene_font.render("Yeah... seems interesting.", False, 'white')
+music_room_cutscene1_dialogue5_surf = cutscene_font.render("Great! Though we only have room for a guitarist...", False, 'lavender')
+music_room_cutscene1_dialogue6_surf = cutscene_font.render("You want it?", False, 'lavender')
+music_room_cutscene1_dialogue7_surf = cutscene_font.render("Yeah, let's do it.", False, 'white')
+music_room_cutscene1_dialogue8_surf = cutscene_font.render("Great! You're trying out... now!", False, 'lavender')
+music_room_cutscene1_dialogue9_surf = cutscene_font.render("Wait! Not even any practice?", False, 'white')
+music_room_cutscene1_dialogue10_surf = cutscene_font.render("You don't enter the music clubroom...", False, 'lavender')
+music_room_cutscene1_dialogue11_surf = cutscene_font.render("...without being prepared, silly!", False, 'lavender')
+music_room_cutscene1_dialogue12_surf = cutscene_font.render("Now, let it rip!", False, 'lavender')
+
+music_room_cutscene_dialogue_rect = music_room_cutscene1_dialogue1_surf.get_rect(topleft=(20, 40))
+
 
 # FIGHT1
 background_surf = pygame.image.load('images/wall_background.png')
@@ -574,7 +599,105 @@ while True:
     if current_state == "MUSIC_ROOM":
         screen.blit(music_room_surf, music_room_rect)
         screen.blit(music_room_main_character_surf, music_room_main_character_rect)
-    
+        screen.blit(music_girl_surf, music_girl_rect)
+
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_w]:
+            music_room_main_character_rect.y -= 5
+        if keys[pygame.K_a]:
+            music_room_main_character_rect.x -= 5
+        if keys[pygame.K_s]:
+            music_room_main_character_rect.y += 5
+        if keys[pygame.K_d]:
+            music_room_main_character_rect.x += 5
+
+        if music_room_main_character_rect.top < 75:
+            music_room_main_character_rect.top = 75
+        if music_room_main_character_rect.left < 140:
+            music_room_main_character_rect.left = 140
+        if music_room_main_character_rect.bottom > 375:
+            music_room_main_character_rect.bottom = 375
+        if music_room_main_character_rect.right > 660:
+            music_room_main_character_rect.right = 660
+
+        if music_room_main_character_rect.colliderect(music_girl_rect):
+            current_state = "MUSIC_ROOM_CUTSCENE"
+            music_room_cutscene_start_time = pygame.time.get_ticks()
+
+    if current_state == "MUSIC_ROOM_CUTSCENE":
+        elapsed = pygame.time.get_ticks() - music_room_cutscene_start_time
+
+        music_room_cutscene1_surface1_surf.fill('black')
+        pygame.draw.rect(music_room_cutscene1_surface1_surf, 'white', music_room_cutscene1_surface1_surf.get_rect(), 3)
+
+        if elapsed < 4000:
+            name_surf = name_font.render('Mayumi', False, 'lavender')
+            music_room_cutscene1_surface1_surf.blit(name_surf, (20, 10))
+            music_room_cutscene1_surface1_surf.blit(music_room_cutscene1_dialogue1_surf, music_room_cutscene_dialogue_rect)
+
+        if 4000 < elapsed < 8000:
+            name_surf = name_font.render('Mayumi', False, 'lavender')
+            music_room_cutscene1_surface1_surf.blit(name_surf, (20, 10))
+            music_room_cutscene1_surface1_surf.blit(music_room_cutscene1_dialogue2_surf, music_room_cutscene_dialogue_rect)
+        
+        if 8000 < elapsed < 12000:
+            name_surf = name_font.render('Mayumi', False, 'lavender')
+            music_room_cutscene1_surface1_surf.blit(name_surf, (20, 10))
+            music_room_cutscene1_surface1_surf.blit(music_room_cutscene1_dialogue3_surf, music_room_cutscene_dialogue_rect)
+        
+        if 12000 < elapsed < 16000:
+            name_surf = name_font.render('Kirito', False, 'white')
+            music_room_cutscene1_surface1_surf.blit(name_surf, (20, 10))
+            music_room_cutscene1_surface1_surf.blit(music_room_cutscene1_dialogue4_surf, music_room_cutscene_dialogue_rect)
+
+        if 16000 < elapsed < 20000:
+            name_surf = name_font.render('Mayumi', False, 'lavender')
+            music_room_cutscene1_surface1_surf.blit(name_surf, (20, 10))
+            music_room_cutscene1_surface1_surf.blit(music_room_cutscene1_dialogue5_surf, music_room_cutscene_dialogue_rect)
+
+        if 20000 < elapsed < 24000:
+            name_surf = name_font.render('Mayumi', False, 'lavender')
+            music_room_cutscene1_surface1_surf.blit(name_surf, (20, 10))
+            music_room_cutscene1_surface1_surf.blit(music_room_cutscene1_dialogue6_surf, music_room_cutscene_dialogue_rect)
+
+        if 24000 < elapsed < 28000:
+            name_surf = name_font.render('Kirito', False, 'white')
+            music_room_cutscene1_surface1_surf.blit(name_surf, (20, 10))
+            music_room_cutscene1_surface1_surf.blit(music_room_cutscene1_dialogue7_surf, music_room_cutscene_dialogue_rect)
+
+        if 28000 < elapsed < 32000:
+            name_surf = name_font.render('Mayumi', False, 'lavender')
+            music_room_cutscene1_surface1_surf.blit(name_surf, (20, 10))
+            music_room_cutscene1_surface1_surf.blit(music_room_cutscene1_dialogue8_surf, music_room_cutscene_dialogue_rect)
+
+        if 32000 < elapsed < 36000:
+            name_surf = name_font.render('Kirito', False, 'white')
+            music_room_cutscene1_surface1_surf.blit(name_surf, (20, 10))
+            music_room_cutscene1_surface1_surf.blit(music_room_cutscene1_dialogue9_surf, music_room_cutscene_dialogue_rect)
+
+        if 36000 < elapsed < 40000:
+            name_surf = name_font.render('Mayumi', False, 'lavender')
+            music_room_cutscene1_surface1_surf.blit(name_surf, (20, 10))
+            music_room_cutscene1_surface1_surf.blit(music_room_cutscene1_dialogue10_surf, music_room_cutscene_dialogue_rect)
+
+        if 40000 < elapsed < 44000:
+            name_surf = name_font.render('Mayumi', False, 'lavender')
+            music_room_cutscene1_surface1_surf.blit(name_surf, (20, 10))
+            music_room_cutscene1_surface1_surf.blit(music_room_cutscene1_dialogue11_surf, music_room_cutscene_dialogue_rect)
+        
+        if 44000 < elapsed < 48000:
+            name_surf = name_font.render('Mayumi', False, 'lavender')
+            music_room_cutscene1_surface1_surf.blit(name_surf, (20, 10))
+            music_room_cutscene1_surface1_surf.blit(music_room_cutscene1_dialogue12_surf, music_room_cutscene_dialogue_rect)
+        
+        screen.blit(music_room_cutscene1_surface1_surf, cutscene1_surface1_rect)
+
+        if elapsed > 48000:
+            current_state = "FIGHT_2"
+
+    if current_state == "FIGHT_2":
+        screen.fill('black')
+
     if current_state == "VICTORY":
         screen.fill("black")
 
