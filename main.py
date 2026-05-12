@@ -160,6 +160,10 @@ background_rect = background_surf.get_rect()
 gaming_surf = pygame.Surface((700, 300), pygame.SRCALPHA)
 gaming_surf.fill((106, 103, 103, 128))
 
+#FIGHT2
+
+hitleft = False
+
 # CHARACTER IMAGE
 character_surf = pygame.image.load('images/main_character_head.png')
 character_surf = pygame.transform.scale(character_surf, (80, 90))
@@ -694,9 +698,100 @@ while True:
 
         if elapsed > 48000:
             current_state = "FIGHT_2"
+            start_time_fight2 = pygame.time.get_ticks()
+            lives_fight2 = 3
+            backpack_rect.x = 675
+            backpack_rect.y = random.randint(100, 250)
+            backpack_speed_x = random.choice([-8, -7, 7, 8])
+            backpack_speed_y = random.choice([-4, -3, -2, 2, 3, 4])
 
     if current_state == "FIGHT_2":
-        screen.fill('black')
+        elapsed_time = pygame.time.get_ticks() - start_time_fight2
+
+        screen.blit(background_surf, background_rect)
+        screen.blit(gaming_surf, (50, 50)) 
+
+        if elapsed_time < GAME_DURATION and lives_fight2 > 0:
+
+            screen.blit(character_surf, character_rect)
+        
+            if elapsed_time < 2000:
+                tutorial_font = pygame.font.Font("fonts/PixelOperatorHB8.ttf", 30)
+                tutorial_text = tutorial_font.render("DODGE THE BACKPACKS!", True, 'red')
+                tutorial_rect = tutorial_text.get_rect(center=(400, 200))
+                screen.blit(tutorial_text, tutorial_rect)    
+
+            # spawn backpack
+            spawn_delay = 3000
+            if elapsed_time > spawn_delay:
+                screen.blit(backpack_surf, backpack_rect)
+
+                backpack_rect.x += backpack_speed_x
+                backpack_rect.y += backpack_speed_y
+
+                
+                if backpack_rect.top <= 35:
+                    backpack_rect.top = 35 
+                    backpack_speed_y *= -1
+                if backpack_rect.bottom >= 365:
+                    backpack_rect.bottom = 365      
+                    backpack_speed_y *= -1
+                if backpack_rect.left <= 50:
+                    backpack_rect.left = 50         
+                    backpack_speed_x *= -1
+                if backpack_rect.right >= 765:
+                    backpack_rect.right = 765  
+                    backpack_speed_x *= -1
+
+
+               
+
+            # controls
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_w]:
+                character_rect.y -= 5
+            if keys[pygame.K_a]:
+                character_rect.x -= 5
+            if keys[pygame.K_s]:
+                character_rect.y += 5
+            if keys[pygame.K_d]:
+                character_rect.x += 5
+
+            # boundaries
+            if character_rect.top < 35:
+                character_rect.top = 35
+            if character_rect.left < 35:
+                character_rect.left = 35
+            if character_rect.bottom > 365:
+                character_rect.bottom = 365
+            if character_rect.right > 765:
+                character_rect.right = 765
+
+            # collision
+            if character_rect.colliderect(backpack_rect):
+                lives_fight2 -= 1
+                print(f"Collision! Lives left: {lives_fight2}")
+                backpack_rect.x = 675
+                backpack_rect.y = random.randint(100, 250)
+
+        else:
+            if lives_fight2 <= 0:
+                current_state = "GAME_OVER"
+            elif elapsed_time >= GAME_DURATION:
+                current_state = "SECOND_HALLWAY_CUTSCENE_BLACK"
+                second_hall_black_start_time = pygame.time.get_ticks()    
+            
+            continue  
+        
+        remaining_time = max(0, (GAME_DURATION - elapsed_time) // 1000)
+        timer_font = pygame.font.Font("fonts/PixelOperator8.ttf", 20)
+        timer_text = timer_font.render(f"Time left: {remaining_time}", True, (0, 0, 0))
+        timer_rect = timer_text.get_rect(center=(400, 30))
+
+        screen.blit(timer_text, timer_rect)
+
+        for i in range(lives_fight2):
+            screen.blit(heart_surf, (10 + i * 35, 10))
 
     if current_state == "VICTORY":
         screen.fill("black")
