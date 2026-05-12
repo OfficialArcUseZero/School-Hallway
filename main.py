@@ -15,7 +15,15 @@ pygame.display.set_caption('Schooltale')
 clock = pygame.time.Clock()
 name_font = pygame.font.Font("fonts/PixelOperatorHB8.ttf", 18)
 
-current_state = "MENU"
+#SOUNDS LIST
+sound_intro = pygame.mixer.Sound('sounds/intro_soundtrack.mp3')
+sound_f1 = pygame.mixer.Sound('sounds/f1_bully.mp3')
+sound_d_f1 = pygame.mixer.Sound('sounds/f1_dial_bully.mp3')
+sound_cs1 = pygame.mixer.Sound('sounds/cs1_beat.mp3')
+sound_death = pygame.mixer.Sound('sounds/death_sound.mp3')
+sound_hit = pygame.mixer.Sound('sounds/hit_sound.mp3')
+
+current_state = "OUTSIDE_FREE_ROAM"
 
 # MENU
 title_font = pygame.font.Font("fonts/PixelOperatorHB8.ttf", 55)
@@ -111,7 +119,7 @@ second_hall_cutscene_dialogue1 = cutscene_font.render('The clubrooms must be beh
 second_hall_cutscene_dialogue2 = cutscene_font.render("Let's see who's open...", False, 'white')
 
 second_hall_cutscene_dialogue_rect = second_hall_cutscene_dialogue1.get_rect(topleft=(20, 40))
-
+ 
 # SECOND HALL FREE ROAM
 second_hall_freeroam_background_surf = pygame.image.load('images/second_hall.png')
 second_hall_freeroam_background_rect = second_hall_background_surf.get_rect()
@@ -160,10 +168,6 @@ background_rect = background_surf.get_rect()
 gaming_surf = pygame.Surface((700, 300), pygame.SRCALPHA)
 gaming_surf.fill((106, 103, 103, 128))
 
-#FIGHT2
-
-hitleft = False
-
 # CHARACTER IMAGE
 character_surf = pygame.image.load('images/main_character_head.png')
 character_surf = pygame.transform.scale(character_surf, (80, 90))
@@ -188,7 +192,14 @@ while True:
             exit()
 
         if current_state == "MENU":
+            sound_intro.play(-1)
+            sound_intro.set_volume(0.7)
             if event.type == pygame.MOUSEBUTTONDOWN:
+                sound_intro.stop()
+
+                sound_cs1.play(-1)
+                sound_cs1.set_volume(0.7)
+
                 current_state = "CUTSCENE1"
                 cutscene_start_time = pygame.time.get_ticks()
                 
@@ -208,7 +219,7 @@ while True:
         screen.blit(start_surf, start_rect)
 
     # CUTSCENE1
-    if current_state == "CUTSCENE1":
+    if current_state == "CUTSCENE1": 
         screen.fill('black')
         elapsed = pygame.time.get_ticks() - cutscene_start_time
         print(elapsed)
@@ -240,6 +251,9 @@ while True:
 
     # OUTSIDE PHASE
     if current_state == "OUTSIDE_PHASE":
+        sound_cs1.stop()
+        sound_intro.play()
+        sound_intro.set_volume(0.7)
         elapsed = pygame.time.get_ticks() - cutscene_start_time
         print(elapsed)
 
@@ -317,6 +331,7 @@ while True:
             door_open = False
 
     if current_state == "INSIDE_CUTSCENE":
+        sound_intro.stop()
         screen.blit(inside_background_surf, inside_background_rect)
         screen.blit(bully_inside_surf, bully_inside_rect)
         screen.blit(main_character_surf, main_character_rect)
@@ -343,6 +358,7 @@ while True:
         if main_character_rect.colliderect(bully_inside_rect):
             dialogue_start_time = pygame.time.get_ticks()
             current_state = "INSIDE_DIALOGUE"
+            sound_d_f1.play()
     
     if current_state == "INSIDE_DIALOGUE":
         elapsed = pygame.time.get_ticks() - dialogue_start_time
@@ -378,6 +394,8 @@ while True:
             current_state = "FIGHT1"
             start_time = pygame.time.get_ticks()
             lives = 3
+            sound_d_f1.stop()
+            sound_f1.play(-1)
 
         screen.blit(cutscene1_surface1_surf, cutscene1_surface1_rect)
 
@@ -434,15 +452,19 @@ while True:
             if character_rect.colliderect(backpack_rect):
                 lives -= 1
                 print(f"Collision! Lives left: {lives}")
+                sound_hit.play(1)
                 backpack_rect.x = 675
                 backpack_rect.y = random.randint(100, 250)
 
         else:
             if lives <= 0:
                 current_state = "GAME_OVER"
+                sound_death.play()
+                sound_f1.stop()
             elif elapsed_time >= GAME_DURATION:
                 current_state = "SECOND_HALLWAY_CUTSCENE_BLACK"
-                second_hall_black_start_time = pygame.time.get_ticks()    
+                second_hall_black_start_time = pygame.time.get_ticks()  
+                sound_cs1.play()
             
             continue  
         
@@ -457,6 +479,7 @@ while True:
             screen.blit(heart_surf, (10 + i * 35, 10))
 
     if current_state == "SECOND_HALLWAY_CUTSCENE_BLACK":
+        sound_f1.stop()
         screen.fill('black')
         elapsed = pygame.time.get_ticks() - second_hall_black_start_time
         print(elapsed)
@@ -492,6 +515,8 @@ while True:
         if elapsed > 30000:
             current_state = "SECOND_HALLWAY_CUTSCENE"
             second_hall_cutscene_start_time = pygame.time.get_ticks()
+            sound_cs1.stop()
+            sound_intro.play(-1)
 
     if current_state == "SECOND_HALLWAY_CUTSCENE":
         elapsed = pygame.time.get_ticks() - second_hall_cutscene_start_time
@@ -627,6 +652,8 @@ while True:
         if music_room_main_character_rect.colliderect(music_girl_rect):
             current_state = "MUSIC_ROOM_CUTSCENE"
             music_room_cutscene_start_time = pygame.time.get_ticks()
+            sound_intro.stop()
+
 
     if current_state == "MUSIC_ROOM_CUTSCENE":
         elapsed = pygame.time.get_ticks() - music_room_cutscene_start_time
@@ -698,100 +725,9 @@ while True:
 
         if elapsed > 48000:
             current_state = "FIGHT_2"
-            start_time_fight2 = pygame.time.get_ticks()
-            lives_fight2 = 3
-            backpack_rect.x = 675
-            backpack_rect.y = random.randint(100, 250)
-            backpack_speed_x = random.choice([-8, -7, 7, 8])
-            backpack_speed_y = random.choice([-4, -3, -2, 2, 3, 4])
 
     if current_state == "FIGHT_2":
-        elapsed_time = pygame.time.get_ticks() - start_time_fight2
-
-        screen.blit(background_surf, background_rect)
-        screen.blit(gaming_surf, (50, 50)) 
-
-        if elapsed_time < GAME_DURATION and lives_fight2 > 0:
-
-            screen.blit(character_surf, character_rect)
-        
-            if elapsed_time < 2000:
-                tutorial_font = pygame.font.Font("fonts/PixelOperatorHB8.ttf", 30)
-                tutorial_text = tutorial_font.render("DODGE THE BACKPACKS!", True, 'red')
-                tutorial_rect = tutorial_text.get_rect(center=(400, 200))
-                screen.blit(tutorial_text, tutorial_rect)    
-
-            # spawn backpack
-            spawn_delay = 3000
-            if elapsed_time > spawn_delay:
-                screen.blit(backpack_surf, backpack_rect)
-
-                backpack_rect.x += backpack_speed_x
-                backpack_rect.y += backpack_speed_y
-
-                
-                if backpack_rect.top <= 35:
-                    backpack_rect.top = 35 
-                    backpack_speed_y *= -1
-                if backpack_rect.bottom >= 365:
-                    backpack_rect.bottom = 365      
-                    backpack_speed_y *= -1
-                if backpack_rect.left <= 50:
-                    backpack_rect.left = 50         
-                    backpack_speed_x *= -1
-                if backpack_rect.right >= 765:
-                    backpack_rect.right = 765  
-                    backpack_speed_x *= -1
-
-
-               
-
-            # controls
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_w]:
-                character_rect.y -= 5
-            if keys[pygame.K_a]:
-                character_rect.x -= 5
-            if keys[pygame.K_s]:
-                character_rect.y += 5
-            if keys[pygame.K_d]:
-                character_rect.x += 5
-
-            # boundaries
-            if character_rect.top < 35:
-                character_rect.top = 35
-            if character_rect.left < 35:
-                character_rect.left = 35
-            if character_rect.bottom > 365:
-                character_rect.bottom = 365
-            if character_rect.right > 765:
-                character_rect.right = 765
-
-            # collision
-            if character_rect.colliderect(backpack_rect):
-                lives_fight2 -= 1
-                print(f"Collision! Lives left: {lives_fight2}")
-                backpack_rect.x = 675
-                backpack_rect.y = random.randint(100, 250)
-
-        else:
-            if lives_fight2 <= 0:
-                current_state = "GAME_OVER"
-            elif elapsed_time >= GAME_DURATION:
-                current_state = "SECOND_HALLWAY_CUTSCENE_BLACK"
-                second_hall_black_start_time = pygame.time.get_ticks()    
-            
-            continue  
-        
-        remaining_time = max(0, (GAME_DURATION - elapsed_time) // 1000)
-        timer_font = pygame.font.Font("fonts/PixelOperator8.ttf", 20)
-        timer_text = timer_font.render(f"Time left: {remaining_time}", True, (0, 0, 0))
-        timer_rect = timer_text.get_rect(center=(400, 30))
-
-        screen.blit(timer_text, timer_rect)
-
-        for i in range(lives_fight2):
-            screen.blit(heart_surf, (10 + i * 35, 10))
+        screen.fill('black')
 
     if current_state == "VICTORY":
         screen.fill("black")
