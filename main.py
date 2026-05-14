@@ -23,12 +23,12 @@ sound_cs1 = pygame.mixer.Sound('sounds/cs1_beat.mp3')
 sound_death = pygame.mixer.Sound('sounds/death_sound.mp3')
 sound_hit = pygame.mixer.Sound('sounds/hit_sound.mp3')
 
-current_state = "MUSIC_ROOM_CUTSCENE2"
+current_state = "MENU"
 
 dialogue_index = 0
 
 
-    # MENU
+# MENU
 title_font = pygame.font.Font("fonts/PixelOperatorHB8.ttf", 55)
 title_surf = title_font.render('SCHOOLTALE', False, 'white')
 title_rect = title_surf.get_rect(center=(400, 150))
@@ -282,7 +282,8 @@ while True:
                 dialogue_states = [
                     "CUTSCENE1", "OUTSIDE_PHASE", "INSIDE_DIALOGUE", 
                     "SECOND_HALLWAY_FREEROAM", "SECOND_HALLWAY_CUTSCENE", 
-                    "SECOND_HALLWAY_CUTSCENE_BLACK", "MUSIC_ROOM_CUTSCENE", "MUSIC_ROOM_CUTSCENE2", "MUSIC_ROOM_CUTSCENE3"
+                    "SECOND_HALLWAY_CUTSCENE_BLACK", "MUSIC_ROOM_CUTSCENE", "MUSIC_ROOM_CUTSCENE2", 
+                    "MUSIC_ROOM_CUTSCENE3",  "FINAL_CUTSCENE"
                 ]
                 
                 if current_state in dialogue_states:
@@ -1067,74 +1068,66 @@ while True:
     
     if current_state == "FINAL_CUTSCENE":
         screen.fill('black')
-        elapsed = pygame.time.get_ticks() - final_cutscene_start_time
-        print(elapsed)
 
         final_cutscene_surface1_surf.fill('black')
         pygame.draw.rect(final_cutscene_surface1_surf, 'white', final_cutscene_surface1_surf.get_rect(), 3)
         
-        if 5000 < elapsed < 10000:
+        # Dialogue Index System
+        if dialogue_index == 0:
             name_surf = name_font.render('Mayumi', False, 'lavender')
             final_cutscene_surface1_surf.blit(name_surf, (20, 10))
             final_cutscene_surface1_surf.blit(final_cutscene_dialogue1, final_cutscene_dialogue_rect)
-            screen.blit(final_cutscene_surface1_surf, cutscene1_surface1_rect)
         
-        if 10000 < elapsed < 15000:
+        elif dialogue_index == 1:
             name_surf = name_font.render('Kaido', False, 'brown')
             final_cutscene_surface1_surf.blit(name_surf, (20, 10))
             final_cutscene_surface1_surf.blit(final_cutscene_dialogue2, final_cutscene_dialogue_rect)
-            screen.blit(final_cutscene_surface1_surf, cutscene1_surface1_rect)
 
-        if 15000 < elapsed < 20000:
+        elif dialogue_index == 2:
             name_surf = name_font.render('Yui', False, 'lightblue')
             final_cutscene_surface1_surf.blit(name_surf, (20, 10))
             final_cutscene_surface1_surf.blit(final_cutscene_dialogue3, final_cutscene_dialogue_rect)
-            screen.blit(final_cutscene_surface1_surf, cutscene1_surface1_rect)
 
-        if 20000 < elapsed < 25000:
+        elif dialogue_index == 3:
             name_surf = name_font.render('Kirito', False, 'white')
             final_cutscene_surface1_surf.blit(name_surf, (20, 10))
             final_cutscene_surface1_surf.blit(final_cutscene_dialogue4, final_cutscene_dialogue_rect)
-            screen.blit(final_cutscene_surface1_surf, cutscene1_surface1_rect)
 
-        if 25000 < elapsed < 30000:
+        elif dialogue_index == 4:
             name_surf = name_font.render('Kirito', False, 'white')
             final_cutscene_surface1_surf.blit(name_surf, (20, 10))
             final_cutscene_surface1_surf.blit(final_cutscene_dialogue5, final_cutscene_dialogue_rect)
-            screen.blit(final_cutscene_surface1_surf, cutscene1_surface1_rect)
 
-        if 30000 < elapsed < 35000:
+        elif dialogue_index == 5:
             name_surf = name_font.render('Kirito', False, 'white')
             final_cutscene_surface1_surf.blit(name_surf, (20, 10))
             final_cutscene_surface1_surf.blit(final_cutscene_dialogue6, final_cutscene_dialogue_rect)
-            screen.blit(final_cutscene_surface1_surf, cutscene1_surface1_rect)
 
-        if 35000 < elapsed < 40000:
+        elif dialogue_index == 6:
             name_surf = name_font.render('Kirito', False, 'white')
             final_cutscene_surface1_surf.blit(name_surf, (20, 10))
             final_cutscene_surface1_surf.blit(final_cutscene_dialogue7, final_cutscene_dialogue_rect)
-            screen.blit(final_cutscene_surface1_surf, cutscene1_surface1_rect)
 
-        if 40000 < elapsed < 45000:
+        elif dialogue_index == 7:
             name_surf = name_font.render('Kirito', False, 'white')
             final_cutscene_surface1_surf.blit(name_surf, (20, 10))
             final_cutscene_surface1_surf.blit(final_cutscene_dialogue8, final_cutscene_dialogue_rect)
-            screen.blit(final_cutscene_surface1_surf, cutscene1_surface1_rect)
 
-        if 45000 < elapsed < 50000:
+        elif dialogue_index == 8:
             name_surf = name_font.render('Kirito', False, 'white')
             final_cutscene_surface1_surf.blit(name_surf, (20, 10))
             final_cutscene_surface1_surf.blit(final_cutscene_dialogue9, final_cutscene_dialogue_rect)
-            screen.blit(final_cutscene_surface1_surf, cutscene1_surface1_rect)
 
-        if 50000 < elapsed < 55000:
+        elif dialogue_index == 9:
             name_surf = name_font.render('Mayumi', False, 'lavender')
             final_cutscene_surface1_surf.blit(name_surf, (20, 10))
             final_cutscene_surface1_surf.blit(final_cutscene_dialogue10, final_cutscene_dialogue_rect)
-            screen.blit(final_cutscene_surface1_surf, cutscene1_surface1_rect)
         
-        if elapsed > 55000:
+        elif dialogue_index >= 10:
             current_state = "VICTORY"
+            dialogue_index = 0 # Reset for safety
+
+        screen.blit(final_cutscene_surface1_surf, cutscene1_surface1_rect)
 
     if current_state == "VICTORY":
         screen.fill("black")
@@ -1143,7 +1136,7 @@ while True:
         victory_text = victory_font.render("THE END!", True, (0, 255, 0))
 
         victory_font2 = pygame.font.Font("fonts/PixelOperator8.ttf", 20)
-        victory_text2 = victory_font2.render("Thanks for playing School Quest!", True, (255, 255, 255))
+        victory_text2 = victory_font2.render("Thanks for playing Bellringer", True, (255, 255, 255))
 
         # blinking text
         t = pygame.time.get_ticks()
