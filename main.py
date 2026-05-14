@@ -11,7 +11,7 @@ door_open = False
 music_collision_start_time = None
 
 screen = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption('Schooltale')
+pygame.display.set_caption('Bellringer')
 clock = pygame.time.Clock()
 name_font = pygame.font.Font("fonts/PixelOperatorHB8.ttf", 18)
 
@@ -22,12 +22,15 @@ sound_d_f1 = pygame.mixer.Sound('sounds/f1_dial_bully.mp3')
 sound_cs1 = pygame.mixer.Sound('sounds/cs1_beat.mp3')
 sound_death = pygame.mixer.Sound('sounds/death_sound.mp3')
 sound_hit = pygame.mixer.Sound('sounds/hit_sound.mp3')
+sound_f2 = pygame.mixer.Sound('sounds/f2_mayumi.mp3')
+sound_d_f2 = pygame.mixer.Sound('sounds/f2_dial_mayumi.mp3')
+sound_ending = pygame.mixer.Sound('sounds/ending_soundtrack.mp3')
 
-current_state = "MUSIC_ROOM"
+current_state = "MENU"
 
-    # MENU
+# MENU
 title_font = pygame.font.Font("fonts/PixelOperatorHB8.ttf", 55)
-title_surf = title_font.render('SCHOOLTALE', False, 'white')
+title_surf = title_font.render('BELLRINGER', False, 'white')
 title_rect = title_surf.get_rect(center=(400, 150))
 
 # CUTSCENE1
@@ -325,14 +328,14 @@ while True:
         elif elapsed > 25000:
             current_state = "OUTSIDE_PHASE"
             main_character_rect.center = (700, 220)
+            sound_intro.play(-1)
+            sound_intro.set_volume(0.7)
 
         screen.blit(cutscene1_surface1_surf, cutscene1_surface1_rect)
 
         # OUTSIDE PHASE
     if current_state == "OUTSIDE_PHASE":
         sound_cs1.stop()
-        sound_intro.play()
-        sound_intro.set_volume(0.7)
         elapsed = pygame.time.get_ticks() - cutscene_start_time
         print(elapsed)
 
@@ -387,6 +390,7 @@ while True:
         door_collision_rect = pygame.Rect(270, 75, 180, 10)
         if main_character_rect.colliderect(door_collision_rect):
             door_open = True
+            sound_cs1.play(-1)
 
             outside_background_surf = outside_background_open_surf
             screen.blit(prompt_surf, prompt_surf_rect)
@@ -436,7 +440,8 @@ while True:
         if main_character_rect.colliderect(bully_inside_rect):
             dialogue_start_time = pygame.time.get_ticks()
             current_state = "INSIDE_DIALOGUE"
-            sound_d_f1.play()
+            sound_cs1.stop()
+            sound_d_f1.play(-1)
         
     if current_state == "INSIDE_DIALOGUE":
         elapsed = pygame.time.get_ticks() - dialogue_start_time
@@ -541,7 +546,7 @@ while True:
                 sound_f1.stop()
             elif elapsed_time >= GAME_DURATION:
                 current_state = "SECOND_HALLWAY_CUTSCENE_BLACK"
-                second_hall_black_start_time = pygame.time.get_ticks()  
+                second_hall_black_start_time = pygame.time.get_ticks()
                 sound_cs1.play(-1)
             
             continue  
@@ -617,6 +622,7 @@ while True:
 
         if elapsed > 10000:
             current_state = "SECOND_HALLWAY_FREEROAM"
+            sound_intro.play(-1)
 
     if current_state == "SECOND_HALLWAY_FREEROAM":
         screen.blit(second_hall_background_surf, second_hall_background_rect)
@@ -699,7 +705,8 @@ while True:
                 screen.blit(club_dialogue_surf, club_dialogue_rect)
             elif elapsed > 10000:
                 current_state = "MUSIC_ROOM"
-                screen.fill('black')
+                sound_intro.stop()
+                sound_cs1.play(-1)
         else:
             music_collision_start_time = None
 
@@ -730,8 +737,9 @@ while True:
         if music_room_main_character_rect.colliderect(music_girl_rect):
             current_state = "MUSIC_ROOM_CUTSCENE"
             music_room_cutscene_start_time = pygame.time.get_ticks()
-            sound_intro.stop()
-            sound_d_f1.play()
+            sound_cs1.stop()
+            sound_d_f2.play(-1)
+            sound_d_f2.set_volume(0.5)
 
     if current_state == "MUSIC_ROOM_CUTSCENE":
         elapsed = pygame.time.get_ticks() - music_room_cutscene_start_time
@@ -803,8 +811,9 @@ while True:
 
         if elapsed > 48000:
             current_state = "FIGHT_2"
-            sound_d_f1.stop()
-            sound_f1.play()
+            sound_d_f2.stop()
+            sound_f2.play(-1)
+            sound_f2.set_volume(0.8)
             start_time_fight2 = pygame.time.get_ticks()
             lives_fight2 = 3
 
@@ -829,8 +838,8 @@ while True:
                 tutorial_rect = tutorial_text.get_rect(center=(400, 200))
                 screen.blit(tutorial_text, tutorial_rect)    
 
-            # spawn backpack
-            spawn_delay = 3000
+            # spawn music notes
+            spawn_delay = 2000
             if elapsed_time > spawn_delay:
                 screen.blit(music_note_surf, music_note_rect)
 
@@ -874,7 +883,7 @@ while True:
 
             # collision
             if character_rect.colliderect(music_note_rect):
-                lives_fight2 -= 1
+                lives_fight2 -= -1
                 print(f"Collision! Lives left: {lives_fight2}")
                 music_note_rect.x = 675
                 music_note_rect.y = random.randint(100, 250)
@@ -884,14 +893,14 @@ while True:
             if lives_fight2 <= 0:
                 current_state = "GAME_OVER"
                 sound_death.play(0)
-                sound_f1.stop()
+                sound_f2.stop()
             elif elapsed_time >= GAME2_DURATION:
                 current_state = "MUSIC_ROOM_CUTSCENE2"
                 music_room_black_start_time = pygame.time.get_ticks()
-                sound_f1.stop()
+                sound_f2.stop()
                 sound_cs1.play(-1)
                 
-            continue  
+            continue
             
         remaining_time = max(0, (GAME2_DURATION - elapsed_time) // 1000)
         timer_font = pygame.font.Font("fonts/PixelOperator8.ttf", 20)
@@ -938,6 +947,8 @@ while True:
         elif elapsed > 25000:
             current_state = "MUSIC_ROOM_CUTSCENE3"
             music_room_cutscene_3_start_time = pygame.time.get_ticks()
+            sound_cs1.stop()
+            sound_d_f2.play(-1)
 
     if current_state == "MUSIC_ROOM_CUTSCENE3":
         screen.blit(music_room_surf, music_room_rect)
@@ -1019,6 +1030,8 @@ while True:
             music_note_rect.y = random.randint(100, 250)
             music_note_speed_x = random.choice([-8, -7, 7, 8])
             music_note_speed_y = random.choice([-4, -3, -2, 2, 3, 4])
+            sound_d_f2.stop()
+            sound_f2.play(-1)
 
     if current_state == "FIGHT_3":
         elapsed_time = pygame.time.get_ticks() - fight_3_start_time
@@ -1087,7 +1100,7 @@ while True:
 
             # collision
             if final_character_rect.colliderect(music_note_rect):
-                lives_fight3 -= 1
+                lives_fight3 -= -1
                 print(f"Collision! Lives left: {lives_fight3}")
                 music_note_rect.x = 675
                 music_note_rect.y = random.randint(100, 250)
@@ -1097,11 +1110,11 @@ while True:
             if lives_fight3 <= 0:
                 current_state = "GAME_OVER"
                 sound_death.play(0)
-                sound_f1.stop()
+                sound_f2.stop()
             elif elapsed_time >= GAME3_DURATION:
                 current_state = "FINAL_CUTSCENE"
                 final_cutscene_start_time = pygame.time.get_ticks()
-                sound_f1.stop()
+                sound_f2.stop()
                 sound_cs1.play(-1)
                 
             continue  
@@ -1186,6 +1199,9 @@ while True:
         
         if elapsed > 55000:
             current_state = "VICTORY"
+            sound_cs1.stop()
+            sound_ending.play(-1)
+
 
     if current_state == "VICTORY":
         screen.fill("black")
@@ -1194,7 +1210,7 @@ while True:
         victory_text = victory_font.render("THE END!", True, (0, 255, 0))
 
         victory_font2 = pygame.font.Font("fonts/PixelOperator8.ttf", 20)
-        victory_text2 = victory_font2.render("Thanks for playing School Quest!", True, (255, 255, 255))
+        victory_text2 = victory_font2.render("Thanks for playing Bellringer!", True, (255, 255, 255))
 
         # blinking text
         t = pygame.time.get_ticks()
@@ -1212,6 +1228,7 @@ while True:
         screen.blit(victory_text3, victory_rect3)
 
         if pygame.mouse.get_pressed()[0]:
+            sound_ending.stop()
             current_state = "MENU"
             door_open = False
             outside_rect = main_character_surf.get_rect(center=(700, 220))
