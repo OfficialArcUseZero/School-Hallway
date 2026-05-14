@@ -11,7 +11,7 @@ door_open = False
 music_collision_start_time = None
 
 screen = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption('Bellringer')
+pygame.display.set_caption('Schooltale')
 clock = pygame.time.Clock()
 name_font = pygame.font.Font("fonts/PixelOperatorHB8.ttf", 18)
 
@@ -22,15 +22,15 @@ sound_d_f1 = pygame.mixer.Sound('sounds/f1_dial_bully.mp3')
 sound_cs1 = pygame.mixer.Sound('sounds/cs1_beat.mp3')
 sound_death = pygame.mixer.Sound('sounds/death_sound.mp3')
 sound_hit = pygame.mixer.Sound('sounds/hit_sound.mp3')
-sound_f2 = pygame.mixer.Sound('sounds/f2_mayumi.mp3')
-sound_d_f2 = pygame.mixer.Sound('sounds/f2_dial_mayumi.mp3')
-sound_ending = pygame.mixer.Sound('sounds/ending_soundtrack.mp3')
 
-current_state = "MENU"
+current_state = "MUSIC_ROOM_CUTSCENE2"
 
-# MENU
+dialogue_index = 0
+
+
+    # MENU
 title_font = pygame.font.Font("fonts/PixelOperatorHB8.ttf", 55)
-title_surf = title_font.render('BELLRINGER', False, 'white')
+title_surf = title_font.render('SCHOOLTALE', False, 'white')
 title_rect = title_surf.get_rect(center=(400, 150))
 
 # CUTSCENE1
@@ -274,6 +274,20 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
+        
+        # THIS IS THE PART THAT REGISTERS THE SPACEBAR
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                # Add every state that has dialogue here
+                dialogue_states = [
+                    "CUTSCENE1", "OUTSIDE_PHASE", "INSIDE_DIALOGUE", 
+                    "SECOND_HALLWAY_FREEROAM", "SECOND_HALLWAY_CUTSCENE", 
+                    "SECOND_HALLWAY_CUTSCENE_BLACK", "MUSIC_ROOM_CUTSCENE", "MUSIC_ROOM_CUTSCENE2", "MUSIC_ROOM_CUTSCENE3"
+                ]
+                
+                if current_state in dialogue_states:
+                    dialogue_index += 1
+                    print(f"Space pressed! Index is now: {dialogue_index}") # Helps you debug
 
     if current_state == "MENU":
         sound_intro.play(-1)
@@ -303,42 +317,30 @@ while True:
         # CUTSCENE1
     if current_state == "CUTSCENE1": 
         screen.fill('black')
-        elapsed = pygame.time.get_ticks() - cutscene_start_time
-        print(elapsed)
-
         cutscene1_surface1_surf.fill('black')
         pygame.draw.rect(cutscene1_surface1_surf, 'white', cutscene1_surface1_surf.get_rect(), 3)
+        name_surf = name_font.render('Kirito', False, 'white')
+        cutscene1_surface1_surf.blit(name_surf, (20, 10))
 
-        if 5000 < elapsed < 10000:
-            name_surf = name_font.render('Kirito', False, 'white')
-            cutscene1_surface1_surf.blit(name_surf, (20, 10))
+        if dialogue_index == 0:
             cutscene1_surface1_surf.blit(dialogue_1_surf, dialogue_rect)
-        elif 10000 < elapsed < 15000:
-            name_surf = name_font.render('Kirito', False, 'white')
-            cutscene1_surface1_surf.blit(name_surf, (20, 10))
+        elif dialogue_index == 1:
             cutscene1_surface1_surf.blit(dialogue_2_surf, dialogue_rect)
-        elif 15000 < elapsed < 20000:
-            name_surf = name_font.render('Kirito', False, 'white')
-            cutscene1_surface1_surf.blit(name_surf, (20, 10))
+        elif dialogue_index == 2:
             cutscene1_surface1_surf.blit(dialogue_3_surf, dialogue_rect)
-        elif 20000 < elapsed < 25000:
-            name_surf = name_font.render('Kirito', False, 'white')
-            cutscene1_surface1_surf.blit(name_surf, (20, 10))
+        elif dialogue_index == 3:
             cutscene1_surface1_surf.blit(dialogue_4_surf, dialogue_rect)
-        elif elapsed > 25000:
+        else:
             current_state = "OUTSIDE_PHASE"
+            dialogue_index = 0 # Reset for the next scene
             main_character_rect.center = (700, 220)
-            sound_intro.play(-1)
-            sound_intro.set_volume(0.7)
 
         screen.blit(cutscene1_surface1_surf, cutscene1_surface1_rect)
 
         # OUTSIDE PHASE
     if current_state == "OUTSIDE_PHASE":
         sound_cs1.stop()
-        elapsed = pygame.time.get_ticks() - cutscene_start_time
-        print(elapsed)
-
+        sound_intro.play()
         screen.blit(outside_background_closed_surf, outside_background_rect)
         screen.blit(main_character_surf, main_character_rect)
 
@@ -347,15 +349,17 @@ while True:
         name_surf = name_font.render('Kirito', False, 'white')
         cutscene1_surface1_surf.blit(name_surf, (20, 10))
 
-        if 25000 < elapsed < 30000:
+        if dialogue_index == 0:
             cutscene1_surface1_surf.blit(outside_dialogue_1, dialogue_rect)
-        elif 30000 < elapsed < 35000:
+        elif dialogue_index == 1:
             cutscene1_surface1_surf.blit(outside_dialogue_2, dialogue_rect)
-        elif 35000 < elapsed < 40000:
+        elif dialogue_index == 2:
             cutscene1_surface1_surf.blit(outside_dialogue_3, dialogue_rect)
-        elif elapsed > 40000:
+        else:
             current_state = "OUTSIDE_FREE_ROAM"
+            dialogue_index = 0 
             main_character_rect.center = (700, 220)
+        
         screen.blit(cutscene1_surface1_surf, cutscene1_surface1_rect)
 
         # FREE ROAM
@@ -390,7 +394,6 @@ while True:
         door_collision_rect = pygame.Rect(270, 75, 180, 10)
         if main_character_rect.colliderect(door_collision_rect):
             door_open = True
-            sound_cs1.play(-1)
 
             outside_background_surf = outside_background_open_surf
             screen.blit(prompt_surf, prompt_surf_rect)
@@ -438,43 +441,41 @@ while True:
             main_character_rect.right = 765
 
         if main_character_rect.colliderect(bully_inside_rect):
-            dialogue_start_time = pygame.time.get_ticks()
+            dialogue_index = 0 
             current_state = "INSIDE_DIALOGUE"
-            sound_cs1.stop()
-            sound_d_f1.play(-1)
+            sound_d_f1.play()
         
     if current_state == "INSIDE_DIALOGUE":
-        elapsed = pygame.time.get_ticks() - dialogue_start_time
-
         cutscene1_surface1_surf.fill('black')
         pygame.draw.rect(cutscene1_surface1_surf, 'white', cutscene1_surface1_surf.get_rect(), 3)
             
-        if elapsed < 4000:
+        if dialogue_index == 0:
             name_surf = name_font.render("Ryuga", False, "red")
             cutscene1_surface1_surf.blit(name_surf, (20, 10))
             cutscene1_surface1_surf.blit(inside_dialogue_1_surf, inside_dialogue_1_rect)
-        elif elapsed < 8000:
+        elif dialogue_index == 1:
             name_surf = name_font.render("Ryuga", False, "red")
             cutscene1_surface1_surf.blit(name_surf, (20, 10))
             cutscene1_surface1_surf.blit(inside_dialogue_2_surf, inside_dialogue_2_rect)
-        elif elapsed < 12000:
+        elif dialogue_index == 2:
             name_surf = name_font.render("Kirito", False, "white")
             cutscene1_surface1_surf.blit(name_surf, (20, 10))
             cutscene1_surface1_surf.blit(inside_dialogue_3_surf, inside_dialogue_3_rect)
-        elif elapsed < 16000:
+        elif dialogue_index == 3:
             name_surf = name_font.render("Ryuga", False, "red")
             cutscene1_surface1_surf.blit(name_surf, (20, 10))
             cutscene1_surface1_surf.blit(inside_dialogue_4_surf, inside_dialogue_4_rect)
-        elif elapsed < 19000:
+        elif dialogue_index == 4:
             name_surf = name_font.render("Kirito", False, "white")
             cutscene1_surface1_surf.blit(name_surf, (20, 10))
             cutscene1_surface1_surf.blit(inside_dialogue_5_surf, inside_dialogue_5_rect)
-        elif elapsed < 20000:
+        elif dialogue_index == 5:
             name_surf = name_font.render("Ryuga", False, "red")
             cutscene1_surface1_surf.blit(name_surf, (20, 10))
             cutscene1_surface1_surf.blit(inside_dialogue_6_surf, inside_dialogue_6_rect)
         else:
             current_state = "FIGHT1"
+            dialogue_index = 0
             start_time = pygame.time.get_ticks()
             lives = 3
             sound_d_f1.stop()
@@ -546,10 +547,10 @@ while True:
                 sound_f1.stop()
             elif elapsed_time >= GAME_DURATION:
                 current_state = "SECOND_HALLWAY_CUTSCENE_BLACK"
-                second_hall_black_start_time = pygame.time.get_ticks()
+                dialogue_index = 0   
                 sound_cs1.play(-1)
-            
-            continue  
+                second_hall_cutscene_start_time = pygame.time.get_ticks()
+              
             
         remaining_time = max(0, (GAME_DURATION - elapsed_time) // 1000)
         timer_font = pygame.font.Font("fonts/PixelOperator8.ttf", 20)
@@ -564,65 +565,27 @@ while True:
     if current_state == "SECOND_HALLWAY_CUTSCENE_BLACK":
         sound_f1.stop()
         screen.fill('black')
-        elapsed = pygame.time.get_ticks() - second_hall_black_start_time
-        print(elapsed)
-
         second_hall_cutscene1_surface1_surf.fill('black')
         pygame.draw.rect(second_hall_cutscene1_surface1_surf, 'white', second_hall_cutscene1_surface1_surf.get_rect(), 3)
-
-        if 5000 < elapsed < 10000:
-            name_surf = name_font.render('Kirito', False, 'white')
-            second_hall_cutscene1_surface1_surf.blit(name_surf, (20, 10))
-            second_hall_cutscene1_surface1_surf.blit(second_hall_dialogue1, second_hall_dialogue_rect)
-            screen.blit(second_hall_cutscene1_surface1_surf, cutscene1_surface1_rect)
-        if 10000 < elapsed < 15000:
-            name_surf = name_font.render('Kirito', False, 'white')
-            second_hall_cutscene1_surface1_surf.blit(name_surf, (20, 10))
-            second_hall_cutscene1_surface1_surf.blit(second_hall_dialogue2, second_hall_dialogue_rect)
-            screen.blit(second_hall_cutscene1_surface1_surf, cutscene1_surface1_rect)
-        if 15000 < elapsed < 20000:
-            name_surf = name_font.render('Kirito', False, 'white')
-            second_hall_cutscene1_surface1_surf.blit(name_surf, (20, 10))
-            second_hall_cutscene1_surface1_surf.blit(second_hall_dialogue3, second_hall_dialogue_rect)
-            screen.blit(second_hall_cutscene1_surface1_surf, cutscene1_surface1_rect)
-        if 20000 < elapsed < 25000:
-            name_surf = name_font.render('Kirito', False, 'white')
-            second_hall_cutscene1_surface1_surf.blit(name_surf, (20, 10))
-            second_hall_cutscene1_surface1_surf.blit(second_hall_dialogue4, second_hall_dialogue_rect)
-            screen.blit(second_hall_cutscene1_surface1_surf, cutscene1_surface1_rect)
-        if 25000 < elapsed < 30000:
-            name_surf = name_font.render('Kirito', False, 'white')
-            second_hall_cutscene1_surface1_surf.blit(name_surf, (20, 10))
-            second_hall_cutscene1_surface1_surf.blit(second_hall_dialogue5, second_hall_dialogue_rect)
-            screen.blit(second_hall_cutscene1_surface1_surf, cutscene1_surface1_rect)
-        if elapsed > 30000:
-            current_state = "SECOND_HALLWAY_CUTSCENE"
-            second_hall_cutscene_start_time = pygame.time.get_ticks()
-            sound_cs1.stop()
-            sound_intro.play(-1)
-
-    if current_state == "SECOND_HALLWAY_CUTSCENE":
-        elapsed = pygame.time.get_ticks() - second_hall_cutscene_start_time
-        print(elapsed)
-        
-        screen.blit(second_hall_background_surf, second_hall_background_rect)
-        screen.blit(second_hall_main_character_surf, second_hall_main_character_rect)
-
-        cutscene1_surface1_surf.fill('black')
-        pygame.draw.rect(cutscene1_surface1_surf, 'white', cutscene1_surface1_surf.get_rect(), 3)
         name_surf = name_font.render('Kirito', False, 'white')
-        cutscene1_surface1_surf.blit(name_surf, (20, 10))
+        second_hall_cutscene1_surface1_surf.blit(name_surf, (20, 10))
 
-        if elapsed < 5000:
-            cutscene1_surface1_surf.blit(second_hall_cutscene_dialogue1, second_hall_cutscene_dialogue_rect)
-        elif 5000 < elapsed < 10000:
-            cutscene1_surface1_surf.blit(second_hall_cutscene_dialogue2, second_hall_cutscene_dialogue_rect)
-
-        screen.blit(cutscene1_surface1_surf, cutscene1_surface1_rect)
-
-        if elapsed > 10000:
+        if dialogue_index == 0:
+            second_hall_cutscene1_surface1_surf.blit(second_hall_dialogue1, second_hall_dialogue_rect)
+        elif dialogue_index == 1:
+            second_hall_cutscene1_surface1_surf.blit(second_hall_dialogue2, second_hall_dialogue_rect)
+        elif dialogue_index == 2:
+            second_hall_cutscene1_surface1_surf.blit(second_hall_dialogue3, second_hall_dialogue_rect)
+        elif dialogue_index == 3:
+            second_hall_cutscene1_surface1_surf.blit(second_hall_dialogue4, second_hall_dialogue_rect)
+        elif dialogue_index == 4:
+            second_hall_cutscene1_surface1_surf.blit(second_hall_dialogue5, second_hall_dialogue_rect)
+        else:
             current_state = "SECOND_HALLWAY_FREEROAM"
+            dialogue_index = 0 
             sound_intro.play(-1)
+        
+        screen.blit(second_hall_cutscene1_surface1_surf, cutscene1_surface1_rect)
 
     if current_state == "SECOND_HALLWAY_FREEROAM":
         screen.blit(second_hall_background_surf, second_hall_background_rect)
@@ -680,35 +643,27 @@ while True:
             screen.blit(club_dialogue_surf, club_dialogue_rect)
 
         if second_hall_main_character_rect.colliderect(music_door_collision_rect):
-            print("collision")
-            if music_collision_start_time is None:
-                music_collision_start_time = pygame.time.get_ticks()
+            # Draw the dialogue box
+            club_dialogue_surf.fill('black')
+            pygame.draw.rect(club_dialogue_surf, 'white', club_dialogue_surf.get_rect(), 3)
+            name_surf = name_font.render('Kirito', False, 'white')
+            club_dialogue_surf.blit(name_surf, (20, 10))
 
-            elapsed = pygame.time.get_ticks() - music_collision_start_time
-            print(elapsed)
-
-            if elapsed < 5000:
+            if dialogue_index == 0:
                 music_text1 = cutscene_font.render("It says: 'Music Club: We're recruiting now!'", False, 'white')
-                club_dialogue_surf.fill('black')
-                pygame.draw.rect(club_dialogue_surf, 'white',club_dialogue_surf.get_rect(), 3)
-                name_surf = name_font.render('Kirito', False, 'white')
-                club_dialogue_surf.blit(name_surf, (20, 10))
                 club_dialogue_surf.blit(music_text1, (20, 40))
                 screen.blit(club_dialogue_surf, club_dialogue_rect)
-            elif 5000 < elapsed < 10000:
+            elif dialogue_index == 1:
                 music_text2 = cutscene_font.render("Hmm... maybe it could be worth a try...", False, 'white')
-                club_dialogue_surf.fill('black')
-                pygame.draw.rect(club_dialogue_surf, 'white',club_dialogue_surf.get_rect(), 3)
-                name_surf = name_font.render('Kirito', False, 'white')
-                club_dialogue_surf.blit(name_surf, (20, 10))
                 club_dialogue_surf.blit(music_text2, (20, 40))
-                screen.blit(club_dialogue_surf, club_dialogue_rect)
-            elif elapsed > 10000:
+                screen.blit(club_dialogue_surf, club_dialogue_rect) 
+            elif dialogue_index >= 2:
+                dialogue_index = 0 
                 current_state = "MUSIC_ROOM"
                 sound_intro.stop()
                 sound_cs1.play(-1)
         else:
-            music_collision_start_time = None
+            dialogue_index = 0
 
     if current_state == "MUSIC_ROOM":
         screen.blit(music_room_surf, music_room_rect)
@@ -736,73 +691,70 @@ while True:
 
         if music_room_main_character_rect.colliderect(music_girl_rect):
             current_state = "MUSIC_ROOM_CUTSCENE"
-            music_room_cutscene_start_time = pygame.time.get_ticks()
-            sound_cs1.stop()
-            sound_d_f2.play(-1)
-            sound_d_f2.set_volume(0.5)
+            dialogue_index == 0
+            sound_intro.stop()
+            sound_d_f1.play()
 
     if current_state == "MUSIC_ROOM_CUTSCENE":
-        elapsed = pygame.time.get_ticks() - music_room_cutscene_start_time
-        print(elapsed)
         music_room_cutscene1_surface1_surf.fill('black')
         pygame.draw.rect(music_room_cutscene1_surface1_surf, 'white', music_room_cutscene1_surface1_surf.get_rect(), 3)
 
-        if elapsed < 4000:
+        if dialogue_index == 0:
             name_surf = name_font.render('Mayumi', False, 'lavender')
             music_room_cutscene1_surface1_surf.blit(name_surf, (20, 10))
             music_room_cutscene1_surface1_surf.blit(music_room_cutscene1_dialogue1_surf, music_room_cutscene_dialogue_rect)
 
-        elif 4000 < elapsed < 8000:
+        elif dialogue_index == 1:
             name_surf = name_font.render('Mayumi', False, 'lavender')
             music_room_cutscene1_surface1_surf.blit(name_surf, (20, 10))
             music_room_cutscene1_surface1_surf.blit(music_room_cutscene1_dialogue2_surf, music_room_cutscene_dialogue_rect)
             
-        elif 8000 < elapsed < 12000:
+        elif dialogue_index == 2:
             name_surf = name_font.render('Mayumi', False, 'lavender')
             music_room_cutscene1_surface1_surf.blit(name_surf, (20, 10))
             music_room_cutscene1_surface1_surf.blit(music_room_cutscene1_dialogue3_surf, music_room_cutscene_dialogue_rect)
             
-        elif 12000 < elapsed < 16000:
+        elif dialogue_index == 3:
             name_surf = name_font.render('Kirito', False, 'white')
             music_room_cutscene1_surface1_surf.blit(name_surf, (20, 10))
             music_room_cutscene1_surface1_surf.blit(music_room_cutscene1_dialogue4_surf, music_room_cutscene_dialogue_rect)
 
-        elif 16000 < elapsed < 20000:
+        elif dialogue_index == 4:
             name_surf = name_font.render('Mayumi', False, 'lavender')
             music_room_cutscene1_surface1_surf.blit(name_surf, (20, 10))
             music_room_cutscene1_surface1_surf.blit(music_room_cutscene1_dialogue5_surf, music_room_cutscene_dialogue_rect)
 
-        elif 20000 < elapsed < 24000:
+        elif dialogue_index == 5:
             name_surf = name_font.render('Mayumi', False, 'lavender')
             music_room_cutscene1_surface1_surf.blit(name_surf, (20, 10))
             music_room_cutscene1_surface1_surf.blit(music_room_cutscene1_dialogue6_surf, music_room_cutscene_dialogue_rect)
 
-        elif 24000 < elapsed < 28000:
+        elif dialogue_index == 6:
             name_surf = name_font.render('Kirito', False, 'white')
             music_room_cutscene1_surface1_surf.blit(name_surf, (20, 10))
             music_room_cutscene1_surface1_surf.blit(music_room_cutscene1_dialogue7_surf, music_room_cutscene_dialogue_rect)
 
-        elif 28000 < elapsed < 32000:
+        elif dialogue_index == 7:
             name_surf = name_font.render('Mayumi', False, 'lavender')
             music_room_cutscene1_surface1_surf.blit(name_surf, (20, 10))
             music_room_cutscene1_surface1_surf.blit(music_room_cutscene1_dialogue8_surf, music_room_cutscene_dialogue_rect)
 
-        elif 32000 < elapsed < 36000:
+        elif dialogue_index == 8:
             name_surf = name_font.render('Kirito', False, 'white')
             music_room_cutscene1_surface1_surf.blit(name_surf, (20, 10))
             music_room_cutscene1_surface1_surf.blit(music_room_cutscene1_dialogue9_surf, music_room_cutscene_dialogue_rect)
 
-        elif 36000 < elapsed < 40000:
+        elif dialogue_index == 9:
             name_surf = name_font.render('Mayumi', False, 'lavender')
             music_room_cutscene1_surface1_surf.blit(name_surf, (20, 10))
             music_room_cutscene1_surface1_surf.blit(music_room_cutscene1_dialogue10_surf, music_room_cutscene_dialogue_rect)
 
-        elif 40000 < elapsed < 44000:
+        elif dialogue_index == 10:
             name_surf = name_font.render('Mayumi', False, 'lavender')
             music_room_cutscene1_surface1_surf.blit(name_surf, (20, 10))
             music_room_cutscene1_surface1_surf.blit(music_room_cutscene1_dialogue11_surf, music_room_cutscene_dialogue_rect)
             
-        elif 44000 < elapsed < 48000:
+        elif dialogue_index == 11:
             name_surf = name_font.render('Mayumi', False, 'lavender')
             music_room_cutscene1_surface1_surf.blit(name_surf, (20, 10))
             music_room_cutscene1_surface1_surf.blit(music_room_cutscene1_dialogue12_surf, music_room_cutscene_dialogue_rect)
@@ -811,10 +763,9 @@ while True:
 
         if elapsed > 48000:
             current_state = "FIGHT_2"
-            sound_d_f2.stop()
-            sound_f2.play(-1)
-            sound_f2.set_volume(0.8)
-            start_time_fight2 = pygame.time.get_ticks()
+            sound_d_f1.stop()
+            sound_f1.play()
+            dialogue_index == 0 
             lives_fight2 = 3
 
             music_note_rect.x = 675
@@ -838,8 +789,8 @@ while True:
                 tutorial_rect = tutorial_text.get_rect(center=(400, 200))
                 screen.blit(tutorial_text, tutorial_rect)    
 
-            # spawn music notes
-            spawn_delay = 2000
+            # spawn backpack
+            spawn_delay = 3000
             if elapsed_time > spawn_delay:
                 screen.blit(music_note_surf, music_note_rect)
 
@@ -883,7 +834,7 @@ while True:
 
             # collision
             if character_rect.colliderect(music_note_rect):
-                lives_fight2 -= -1
+                lives_fight2 -= 1
                 print(f"Collision! Lives left: {lives_fight2}")
                 music_note_rect.x = 675
                 music_note_rect.y = random.randint(100, 250)
@@ -893,14 +844,14 @@ while True:
             if lives_fight2 <= 0:
                 current_state = "GAME_OVER"
                 sound_death.play(0)
-                sound_f2.stop()
+                sound_f1.stop()
             elif elapsed_time >= GAME2_DURATION:
                 current_state = "MUSIC_ROOM_CUTSCENE2"
                 music_room_black_start_time = pygame.time.get_ticks()
-                sound_f2.stop()
+                sound_f1.stop()
                 sound_cs1.play(-1)
                 
-            continue
+            continue  
             
         remaining_time = max(0, (GAME2_DURATION - elapsed_time) // 1000)
         timer_font = pygame.font.Font("fonts/PixelOperator8.ttf", 20)
@@ -914,41 +865,36 @@ while True:
 
     if current_state == "MUSIC_ROOM_CUTSCENE2":
         screen.fill('black')
-        elapsed = pygame.time.get_ticks() - music_room_black_start_time
-        print(elapsed)
 
         music_room_cutscene2_surface1_surf.fill('black')
         pygame.draw.rect(music_room_cutscene2_surface1_surf, 'white', music_room_cutscene2_surface1_surf.get_rect(), 3)
 
-        if 5000 < elapsed < 10000:
+        if dialogue_index == 0:
             name_surf = name_font.render('Mayumi', False, 'lavender')
             music_room_cutscene2_surface1_surf.blit(name_surf, (20, 10))
             music_room_cutscene2_surface1_surf.blit(music_room_cutscene2_dialogue1_surf, music_room2_dialogue_rect)
-            screen.blit(music_room_cutscene2_surface1_surf, cutscene1_surface1_rect)
 
-        elif 10000 < elapsed < 15000:
+        elif dialogue_index == 1:
             name_surf = name_font.render('Mayumi', False, 'lavender')
             music_room_cutscene2_surface1_surf.blit(name_surf, (20, 10))
             music_room_cutscene2_surface1_surf.blit(music_room_cutscene2_dialogue2_surf, music_room2_dialogue_rect)
-            screen.blit(music_room_cutscene2_surface1_surf, cutscene1_surface1_rect)
 
-        elif 15000 < elapsed < 20000:
+        elif dialogue_index == 2:
             name_surf = name_font.render('Mayumi', False, 'lavender')
             music_room_cutscene2_surface1_surf.blit(name_surf, (20, 10))
             music_room_cutscene2_surface1_surf.blit(music_room_cutscene2_dialogue3_surf, music_room2_dialogue_rect)
-            screen.blit(music_room_cutscene2_surface1_surf, cutscene1_surface1_rect)
 
-        elif 20000 < elapsed < 25000:
+        elif dialogue_index == 3:
             name_surf = name_font.render('Kirito', False, 'white')
             music_room_cutscene2_surface1_surf.blit(name_surf, (20, 10))
             music_room_cutscene2_surface1_surf.blit(music_room_cutscene2_dialogue4_surf, music_room2_dialogue_rect)
-            screen.blit(music_room_cutscene2_surface1_surf, cutscene1_surface1_rect)
 
-        elif elapsed > 25000:
+        elif dialogue_index >= 4:
             current_state = "MUSIC_ROOM_CUTSCENE3"
+            dialogue_index = 0 # RESET for the next scene
             music_room_cutscene_3_start_time = pygame.time.get_ticks()
-            sound_cs1.stop()
-            sound_d_f2.play(-1)
+
+        screen.blit(music_room_cutscene2_surface1_surf, cutscene1_surface1_rect)
 
     if current_state == "MUSIC_ROOM_CUTSCENE3":
         screen.blit(music_room_surf, music_room_rect)
@@ -957,81 +903,71 @@ while True:
         screen.blit(music_room_cutscene3_music_boy_surf, music_room_cutscene3_music_boy_rect)
         screen.blit(music_room_cutscene3_bass_girl_surf, music_room_cutscene3_bass_girl_rect)
 
-        elapsed = pygame.time.get_ticks() - music_room_cutscene_3_start_time
-
         music_room_cutscene3_surface1_surf.fill('black')
         pygame.draw.rect(music_room_cutscene3_surface1_surf, 'white', music_room_cutscene3_surface1_surf.get_rect(), 3)
 
-        if elapsed < 5000:
+        if dialogue_index == 0:
             name_surf = name_font.render('Mayumi', False, 'lavender')
             music_room_cutscene3_surface1_surf.blit(name_surf, (20, 10))
             music_room_cutscene3_surface1_surf.blit(music_room_cutscene3_dialogue1, music_room_cutscene3_dialogue_rect)
-            screen.blit(music_room_cutscene3_surface1_surf, cutscene1_surface1_rect)
 
-        if 5000 < elapsed < 10000:
+        elif dialogue_index == 1:
             name_surf = name_font.render('Kaido', False, 'maroon')
             music_room_cutscene3_surface1_surf.blit(name_surf, (20, 10))
             music_room_cutscene3_surface1_surf.blit(music_room_cutscene3_dialogue2, music_room_cutscene3_dialogue_rect)
-            screen.blit(music_room_cutscene3_surface1_surf, cutscene1_surface1_rect)
 
-        if 10000 < elapsed < 15000:
+        elif dialogue_index == 2:
             name_surf = name_font.render('Yui', False, 'lightblue')
             music_room_cutscene3_surface1_surf.blit(name_surf, (20, 10))
             music_room_cutscene3_surface1_surf.blit(music_room_cutscene3_dialogue3, music_room_cutscene3_dialogue_rect)
-            screen.blit(music_room_cutscene3_surface1_surf, cutscene1_surface1_rect)
 
-        if 15000 < elapsed < 20000:
+        elif dialogue_index == 3:
             name_surf = name_font.render('Kirito', False, 'white')
             music_room_cutscene3_surface1_surf.blit(name_surf, (20, 10))
             music_room_cutscene3_surface1_surf.blit(music_room_cutscene3_dialogue4, music_room_cutscene3_dialogue_rect)
-            screen.blit(music_room_cutscene3_surface1_surf, cutscene1_surface1_rect)
 
-        if 20000 < elapsed < 25000:
+        elif dialogue_index == 4:
             name_surf = name_font.render('Kirito', False, 'white')
             music_room_cutscene3_surface1_surf.blit(name_surf, (20, 10))
-            music_room_cutscene3_surface1_surf.blit(music_room_cutscene3_dialogue5, music_room_cutscene3_dialogue_rect)
-            screen.blit(music_room_cutscene3_surface1_surf, cutscene1_surface1_rect)
+            music_room_cutscene3_surface1_surf.blit(music_room_cutscene3_dialogue5, music_room_cutscene_dialogue_rect)
 
-        if 25000 < elapsed < 30000:
+        elif dialogue_index == 5:
             name_surf = name_font.render('Kirito', False, 'white')
             music_room_cutscene3_surface1_surf.blit(name_surf, (20, 10))
-            music_room_cutscene3_surface1_surf.blit(music_room_cutscene3_dialogue6, music_room_cutscene3_dialogue_rect)
-            screen.blit(music_room_cutscene3_surface1_surf, cutscene1_surface1_rect)
+            music_room_cutscene3_surface1_surf.blit(music_room_cutscene3_dialogue6, music_room_cutscene_dialogue_rect)
 
-        if 30000 < elapsed < 35000:
+        elif dialogue_index == 6:
             name_surf = name_font.render('Kaido', False, 'brown')
             music_room_cutscene3_surface1_surf.blit(name_surf, (20, 10))
-            music_room_cutscene3_surface1_surf.blit(music_room_cutscene3_dialogue7, music_room_cutscene3_dialogue_rect)
-            screen.blit(music_room_cutscene3_surface1_surf, cutscene1_surface1_rect)
+            music_room_cutscene3_surface1_surf.blit(music_room_cutscene3_dialogue7, music_room_cutscene_dialogue_rect)
 
-        if 35000 < elapsed < 40000:
+        elif dialogue_index == 7:
             name_surf = name_font.render('Kaido', False, 'brown')
             music_room_cutscene3_surface1_surf.blit(name_surf, (20, 10))
-            music_room_cutscene3_surface1_surf.blit(music_room_cutscene3_dialogue8, music_room_cutscene3_dialogue_rect)
-            screen.blit(music_room_cutscene3_surface1_surf, cutscene1_surface1_rect)
+            music_room_cutscene3_surface1_surf.blit(music_room_cutscene3_dialogue8, music_room_cutscene_dialogue_rect)
 
-        if 40000 < elapsed < 45000:
+        elif dialogue_index == 8:
             name_surf = name_font.render('Mayumi', False, 'lavender')
             music_room_cutscene3_surface1_surf.blit(name_surf, (20, 10))
-            music_room_cutscene3_surface1_surf.blit(music_room_cutscene3_dialogue9, music_room_cutscene3_dialogue_rect)
-            screen.blit(music_room_cutscene3_surface1_surf, cutscene1_surface1_rect)
+            music_room_cutscene3_surface1_surf.blit(music_room_cutscene3_dialogue9, music_room_cutscene_dialogue_rect)
 
-        if 45000 < elapsed < 50000:
+        elif dialogue_index == 10:
             name_surf = name_font.render('Kirito', False, 'white')
             music_room_cutscene3_surface1_surf.blit(name_surf, (20, 10))
-            music_room_cutscene3_surface1_surf.blit(music_room_cutscene3_dialogue10, music_room_cutscene3_dialogue_rect)
-            screen.blit(music_room_cutscene3_surface1_surf, cutscene1_surface1_rect)
+            music_room_cutscene3_surface1_surf.blit(music_room_cutscene3_dialogue10, music_room_cutscene_dialogue_rect)
 
-        if elapsed > 50000:
+        elif dialogue_index >= 11:
+            # Move to Fight 3
             current_state = "FIGHT_3"
+            dialogue_index = 0
             fight_3_start_time = pygame.time.get_ticks()
             lives_fight3 = 3
             music_note_rect.x = 675
             music_note_rect.y = random.randint(100, 250)
             music_note_speed_x = random.choice([-8, -7, 7, 8])
             music_note_speed_y = random.choice([-4, -3, -2, 2, 3, 4])
-            sound_d_f2.stop()
-            sound_f2.play(-1)
+
+        screen.blit(music_room_cutscene3_surface1_surf, cutscene1_surface1_rect)
 
     if current_state == "FIGHT_3":
         elapsed_time = pygame.time.get_ticks() - fight_3_start_time
@@ -1100,7 +1036,7 @@ while True:
 
             # collision
             if final_character_rect.colliderect(music_note_rect):
-                lives_fight3 -= -1
+                lives_fight3 -= 1
                 print(f"Collision! Lives left: {lives_fight3}")
                 music_note_rect.x = 675
                 music_note_rect.y = random.randint(100, 250)
@@ -1110,11 +1046,11 @@ while True:
             if lives_fight3 <= 0:
                 current_state = "GAME_OVER"
                 sound_death.play(0)
-                sound_f2.stop()
+                sound_f1.stop()
             elif elapsed_time >= GAME3_DURATION:
                 current_state = "FINAL_CUTSCENE"
                 final_cutscene_start_time = pygame.time.get_ticks()
-                sound_f2.stop()
+                sound_f1.stop()
                 sound_cs1.play(-1)
                 
             continue  
@@ -1199,9 +1135,6 @@ while True:
         
         if elapsed > 55000:
             current_state = "VICTORY"
-            sound_cs1.stop()
-            sound_ending.play(-1)
-
 
     if current_state == "VICTORY":
         screen.fill("black")
@@ -1210,7 +1143,7 @@ while True:
         victory_text = victory_font.render("THE END!", True, (0, 255, 0))
 
         victory_font2 = pygame.font.Font("fonts/PixelOperator8.ttf", 20)
-        victory_text2 = victory_font2.render("Thanks for playing Bellringer!", True, (255, 255, 255))
+        victory_text2 = victory_font2.render("Thanks for playing School Quest!", True, (255, 255, 255))
 
         # blinking text
         t = pygame.time.get_ticks()
@@ -1228,7 +1161,6 @@ while True:
         screen.blit(victory_text3, victory_rect3)
 
         if pygame.mouse.get_pressed()[0]:
-            sound_ending.stop()
             current_state = "MENU"
             door_open = False
             outside_rect = main_character_surf.get_rect(center=(700, 220))
